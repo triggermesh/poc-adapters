@@ -75,7 +75,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	}
 }
 
-var _ pkgadapter.Adapter = (*Adapter)(nil)
+var _ pkgadapter.Adapter = (*adapter)(nil)
 
 type adapter struct {
 	query *gojq.Query
