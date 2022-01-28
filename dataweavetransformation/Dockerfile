@@ -1,9 +1,11 @@
-FROM gcr.io/ultra-hologram-297914/dwbi
-ENV CGO_ENABLED 0
+FROM gcr.io/ultra-hologram-297914/dwbi:latest
 WORKDIR /app
-RUN export DW_HOME=/app/.dw
-RUN export DW_LIB_PATH=%DW_HOME%/libs
-RUN export PATH=$DW_HOME/bin:$PATH
+ENV CGO_ENABLED 0
+ENV DW_HOME=/app/.dw
+ENV DW_LIB_PATH=/app/.dw/libs
+ENV PATH=/app/.dw/bin:$PATH
+ENV PATH=$PATH:/usr/local/go/bin
+
 COPY . ./
 RUN cd cmd && go build -o /dwadapter
 EXPOSE 8080

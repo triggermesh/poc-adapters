@@ -1,10 +1,6 @@
-FROM openjdk:18-jdk-alpine
-COPY --from=golang:1.17-alpine /usr/local/go/ /usr/local/go/
-ENV PATH="/usr/local/go/bin:${PATH}"
-RUN apk update && apk upgrade && apk add bash && apk add git
+FROM ubuntu:latest
 RUN mkdir /app
-COPY dw /app/.dw/dw
-RUN chmod +x /app/.dw/dw
-RUN export DW_HOME=/app/.dw
-RUN export DW_LIB_PATH=%DW_HOME%/libs
-RUN export PATH=$DW_HOME/bin:$PATH
+COPY dw /app/.dw/bin/dw
+RUN chmod +x /app/.dw/bin/dw
+RUN apt-get update && apt-get install wget -y
+RUN wget -c https://go.dev/dl/go1.17.6.linux-amd64.tar.gz && tar -C /usr/local -xzf go1.17.6.linux-amd64.tar.gz
