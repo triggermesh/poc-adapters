@@ -38,7 +38,7 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 	// Spell defines the Dataweave spell to use on the incoming data at the event payload
-	Spell string `envconfig:"DW_SPELL" default:"output application/json --- payload filter (item) -> item.age > 17"`
+	Spell string `envconfig:"DW_SPELL" required:"true"`
 	// Spell string `envconfig:"DW_SPELL" required:"true"`
 	// IncomingContentType defines the expected content type of the incoming data
 	IncomingContentType string `envconfig:"CONTENT_TYPE" default:"application/json"`
