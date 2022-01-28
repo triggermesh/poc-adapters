@@ -20,7 +20,6 @@ import (
 	"context"
 	"os"
 	"os/exec"
-	"strings"
 
 	"go.uber.org/zap"
 
@@ -65,7 +64,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
 
-	return &Adapter{
+	return &adapter{
 		spell:       env.Spell,
 		contentType: env.IncomingContentType,
 
@@ -76,9 +75,9 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	}
 }
 
-var _ pkgadapter.Adapter = (*Adapter)(nil)
+var _ pkgadapter.Adapter = (*adapter)(nil)
 
-type Adapter struct {
+type adapter struct {
 	spell       string
 	contentType string
 
@@ -90,36 +89,26 @@ type Adapter struct {
 
 // Start is a blocking function and will return if an error occurs
 // or the context is cancelled.
-func (a *Adapter) Start(ctx context.Context) error {
+func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting Dataweave Transformation Adapter")
 
 	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
-func (a *Adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
-	// path := os.Getenv("KO_DATA_PATH") + "/static/dw"
-	fileName := event.ID() + ".json"
-	f := os.NewFile(0, fileName)
-	// f := os.NewFile(0, "event.json")
-	err := os.WriteFile("event.json", event.Data(), 0644)
+func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
+	fileName := "event.json"
+	err := os.WriteFile(fileName, event.Data(), 0644)
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating the file")
 	}
-	defer f.Close()
 
-	cmd := `./dw -i payload event.json "` + a.spell + `"`
-	// cmd := path + ` -i payload event.json "` + a.spell + `"`
+	cmd := `dw -i payload ` + fileName + ` "` + a.spell + `"`
 	out, err := exec.Command("bash", "-c", cmd).Output()
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "executing the spell")
 	}
 
-	// delete the file
-
-	output := string(out)
-	cleaned := strings.ReplaceAll(output, "\n", "")
-
-	if err := event.SetData(a.contentType, cleaned); err != nil {
+	if err := event.SetData(a.contentType, out); err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 	return &event, cloudevents.ResultACK
