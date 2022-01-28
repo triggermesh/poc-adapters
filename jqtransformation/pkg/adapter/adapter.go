@@ -65,7 +65,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		logger.Panicf("Error creating query: %v", err)
 	}
 
-	return &Adapter{
+	return &adapter{
 		query: query,
 
 		sink:     env.Sink,
@@ -75,9 +75,9 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	}
 }
 
-var _ pkgadapter.Adapter = (*Adapter)(nil)
+var _ pkgadapter.Adapter = (*adapter)(nil)
 
-type Adapter struct {
+type adapter struct {
 	query *gojq.Query
 
 	sink     string
@@ -88,12 +88,12 @@ type Adapter struct {
 
 // Start is a blocking function and will return if an error occurs
 // or the context is cancelled.
-func (a *Adapter) Start(ctx context.Context) error {
+func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting JQTransformation Adapter")
 	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
-func (a *Adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
+func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	var data map[string]interface{}
 	var qd interface{}
 	if err := event.DataAs(&data); err != nil {
