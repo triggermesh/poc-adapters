@@ -108,6 +108,11 @@ func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "executing the spell")
 	}
 
+	err = os.Remove(fileName)
+	if err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "removing the file")
+	}
+
 	if err := event.SetData(a.contentType, out); err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
