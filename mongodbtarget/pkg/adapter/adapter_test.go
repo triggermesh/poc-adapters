@@ -35,7 +35,6 @@ import (
 
 const (
 	tCloudEventID     = "ce-abcd-0123"
-	tCloudEventType   = "ce.test.type"
 	tCloudEventSource = "ce.test.source"
 
 	tCollection = "test"
