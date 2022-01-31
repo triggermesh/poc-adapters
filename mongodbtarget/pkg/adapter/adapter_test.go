@@ -19,6 +19,7 @@ package mongodbtarget
 import (
 	"context"
 	"os"
+	"strings"
 	"testing"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
@@ -40,16 +41,23 @@ const (
 	tCollection = "test"
 	tDatabase   = "test"
 
-	tQuery        = ".foo | .."
-	tInsert       = `{"database":"test","collection": "test","mapStrVal":{"test":"testvalue","test2":"test3"}}`
-	tExpectedJSON = "{\"foo\":\"richard@triggermesh.com\"}"
+	tInsert = `{"database":"test","collection": "test","mapStrVal":{"test":"testvalue","test2":"test3"}}`
+	tUpdate = `{"database":"test","collection": "test","searchKey":"test","searchValue":"testvalue","updateKey":"partstore","updateValue":"UP FOR GRABS"}`
+	tQuery  = `{"database":"test","Collection": "test","key":"partstore","value":"UP FOR GRABS"}`
 
-	tFalseJSON       = "not json"
-	tExpectedFailure = "{\"Code\":\"request-parsing\",\"Description\":\"[xml] found bytes, but failed to unmarshal: EOF not json\",\"Details\":null}"
+	tQueryResponse = `[
+		{
+			"_id": "61f833e3014b8d672333a2c9",
+			"partstore": "UP FOR GRABS",
+			"test": "testdd1",
+			"test2": "test3"
+		}
+	]`
 )
 
 // requires the enviroment variable `MONGODB_SERVER_URL` to contain a valid mongodb connection string
 
+// Insert the tInsert test data into a mongodb table via sending an event of type io.triggermesh.mongodb.insert
 func TestInsert(t *testing.T) {
 	ctx := context.Background()
 	serverUrl := os.Getenv("MONGODB_SERVER_URL")
@@ -80,22 +88,98 @@ func TestInsert(t *testing.T) {
 			mA.dispatch(tc.inEvent)
 
 			// find the inserted values
-			episodesFiltered := findInsertedValues("testvalue", client, t)
+			episodesFiltered := findInsertedValues("test", "testvalue", client, t)
 			assert.Equal(t, 1, len(episodesFiltered), "should contain 1")
 			assert.Equal(t, "testvalue", string(episodesFiltered[0]["test"].(string)), "should contain `testvalue`")
 
+		})
+	}
+}
+
+// Update the previously inserted tInsert test data into a mongodb table via sending an event of type io.triggermesh.mongodb.update
+func TestUpdate(t *testing.T) {
+	ctx := context.Background()
+	serverUrl := os.Getenv("MONGODB_SERVER_URL")
+	require.NotEmpty(t, serverUrl, "MONGODB_SERVER_URL must be set")
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(serverUrl))
+	require.NotNil(t, client, "client should not be nil")
+	require.Nil(t, err, "error should be nil")
+	testCases := map[string]struct {
+		inEvent cloudevents.Event
+		mClient *mongo.Client
+	}{
+		"Consume event of type io.triggermesh.mongodb.update": {
+			inEvent: newCloudEvent(tUpdate, "io.triggermesh.mongodb.update"),
+			mClient: client,
+		},
+	}
+
+	for n, tc := range testCases {
+		t.Run(n, func(t *testing.T) {
+
+			ceClient := adaptertest.NewTestClient()
+			mA := &mongodbAdapter{
+				logger:   logtesting.TestLogger(t),
+				ceClient: ceClient,
+				mclient:  tc.mClient,
+			}
+
+			mA.dispatch(tc.inEvent)
+
+			// find the updated values
+			episodesFiltered := findInsertedValues("partstore", "UP FOR GRABS", client, t)
+			assert.Equal(t, 1, len(episodesFiltered), "should contain 1")
+			assert.Equal(t, "UP FOR GRABS", string(episodesFiltered[0]["partstore"].(string)), "should contain `testvalue`")
+
+		})
+	}
+}
+
+// Find the changed values in the mongodb table created by the tested io.triggermesh.mongodb.update event
+// by testing the consumtion of an event of type io.triggermesh.mongodb.query.kv
+func TestQueryKV(t *testing.T) {
+	ctx := context.Background()
+	serverUrl := os.Getenv("MONGODB_SERVER_URL")
+	require.NotEmpty(t, serverUrl, "MONGODB_SERVER_URL must be set")
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(serverUrl))
+	require.NotNil(t, client, "client should not be nil")
+	require.Nil(t, err, "error should be nil")
+	testCases := map[string]struct {
+		inEvent cloudevents.Event
+		mClient *mongo.Client
+	}{
+		"Consume event of type io.triggermesh.mongodb.query.kv": {
+			inEvent: newCloudEvent(tQuery, "io.triggermesh.mongodb.query.kv"),
+			mClient: client,
+		},
+	}
+
+	for n, tc := range testCases {
+		t.Run(n, func(t *testing.T) {
+
+			ceClient := adaptertest.NewTestClient()
+			mA := &mongodbAdapter{
+				logger:   logtesting.TestLogger(t),
+				ceClient: ceClient,
+				mclient:  tc.mClient,
+			}
+
+			e, _ := mA.dispatch(tc.inEvent)
+			sv := e.String()
+			found := strings.Contains(sv, "UP FOR GRABS")
+			assert.True(t, found, "should contain `UP FOR GRABS`")
 		})
 	}
 	// cleanup
 	client.Database(tDatabase).Collection(tCollection).Drop(ctx)
 }
 
-func findInsertedValues(value string, c *mongo.Client, t *testing.T) []bson.M {
+func findInsertedValues(key, value string, c *mongo.Client, t *testing.T) []bson.M {
 	ctx := context.Background()
 	var err error
 
 	collection := c.Database("test").Collection("test")
-	filterCursor, err := collection.Find(ctx, bson.M{"test": value})
+	filterCursor, err := collection.Find(ctx, bson.M{key: value})
 	require.Nil(t, err, "error should be nil")
 
 	var episodesFiltered []bson.M
@@ -120,48 +204,9 @@ func newCloudEvent(data, cetype string) cloudevents.Event {
 	return event
 }
 
-// func TestSink(t *testing.T) {
-// 	testCases := map[string]struct {
-// 		inEvent     cloudevents.Event
-// 		expectEvent cloudevents.Event
-// 		query       string
-// 	}{
-// 		"sink ok": {
-// 			inEvent:     newCloudEvent(t, tJSON, cloudevents.ApplicationJSON),
-// 			expectEvent: newCloudEvent(t, tExpectedJSON, cloudevents.ApplicationJSON),
-// 			query:       tQuery,
-// 		},
-// 	}
-// 	for name, tc := range testCases {
-// 		t.Run(name, func(t *testing.T) {
-// 			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 				body, err := ioutil.ReadAll(r.Body)
-// 				assert.NoError(t, err)
-// 				assert.Equal(t, tExpectedJSON, string(body))
-// 				fmt.Fprintf(w, "OK")
-// 			}))
-// 			defer svr.Close()
-
-// 			env := &envAccessor{
-// 				EnvConfig: adapter.EnvConfig{
-// 					Component: tCloudEventSource,
-// 					Sink:      svr.URL,
-// 				},
-// 				Query: tc.query,
-// 			}
-// 			ctx := context.Background()
-// 			c, err := cloudevents.NewClientHTTP()
-// 			assert.NoError(t, err)
-// 			a := NewAdapter(ctx, env, c)
-
-// 			go func() {
-// 				if err := a.Start(ctx); err != nil {
-// 					assert.FailNow(t, "could not start test adapter")
-// 				}
-// 			}()
-
-// 			response := sendCE(t, &tc.inEvent, c, svr.URL)
-// 			assert.NotEqual(t, cloudevents.IsUndelivered(response), response)
-// 		})
-// 	}
-// }
+type kVResult []struct {
+	ID        string `json:"_id"`
+	Partstore string `json:"partstore"`
+	Test      string `json:"test"`
+	Test2     string `json:"test2"`
+}
