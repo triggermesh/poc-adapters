@@ -44,15 +44,6 @@ const (
 	tInsert = `{"database":"test","collection": "test","mapStrVal":{"test":"testvalue","test2":"test3"}}`
 	tUpdate = `{"database":"test","collection": "test","searchKey":"test","searchValue":"testvalue","updateKey":"partstore","updateValue":"UP FOR GRABS"}`
 	tQuery  = `{"database":"test","Collection": "test","key":"partstore","value":"UP FOR GRABS"}`
-
-	tQueryResponse = `[
-		{
-			"_id": "61f833e3014b8d672333a2c9",
-			"partstore": "UP FOR GRABS",
-			"test": "testdd1",
-			"test2": "test3"
-		}
-	]`
 )
 
 // requires the enviroment variable `MONGODB_SERVER_URL` to contain a valid mongodb connection string
@@ -170,7 +161,6 @@ func TestQueryKV(t *testing.T) {
 			assert.True(t, found, "should contain `UP FOR GRABS`")
 		})
 	}
-	// cleanup
 	client.Database(tDatabase).Collection(tCollection).Drop(ctx)
 }
 
@@ -202,11 +192,4 @@ func newCloudEvent(data, cetype string) cloudevents.Event {
 	event.SetType(cetype)
 
 	return event
-}
-
-type kVResult []struct {
-	ID        string `json:"_id"`
-	Partstore string `json:"partstore"`
-	Test      string `json:"test"`
-	Test2     string `json:"test2"`
 }
