@@ -12,6 +12,10 @@ spec:
   workload:
     fromImage:
       repo: gcr.io/ultra-hologram-297914/dw:latest
+    formFactor:
+      knativeService:
+        minScale: 1
+        maxScale: 10
 
     parameterOptions:
       arbitraryParameters: false
