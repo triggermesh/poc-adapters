@@ -25,3 +25,5 @@ spec:
     parameters:
     - name: query
       type: string
+    - name: k_sink
+      type: string
