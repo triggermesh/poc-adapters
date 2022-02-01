@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// Package mongodbtarget implements an adapter that connects to a MongoDB database
+// and allows a user to insert, query, and update documents via cloudevents.
 package mongodbtarget
 
 import (
@@ -108,7 +110,7 @@ func (a *mongodbAdapter) kvQuery(e cloudevents.Event, ctx context.Context) (*clo
 	responseEvent := cloudevents.NewEvent(cloudevents.VersionV1)
 	err = responseEvent.SetData("application/json", episodesFiltered)
 	if err != nil {
-		a.reportError("error generating response event: ", err)
+		return a.reportError("error generating response event: ", err)
 	}
 
 	responseEvent.SetType("io.triggermesh.mongodb.query.kv.result")
@@ -170,7 +172,7 @@ func (a *mongodbAdapter) reportError(msg string, err error) (*cloudevents.Event,
 	responseEvent.SetSubject("error")
 	responseEvent.SetDataContentType(cloudevents.ApplicationJSON)
 	if result := responseEvent.SetData(cloudevents.ApplicationJSON, msg); !cloudevents.IsACK(result) {
-		a.reportError("error setting response event data: ", result)
+		a.logger.Errorw("could not set error response data")
 	}
 	return &responseEvent, cloudevents.NewHTTPResult(http.StatusInternalServerError, msg)
 }

@@ -1,0 +1,27 @@
+# golangci-lint configuration
+#
+# For a list of all available configuration options with their default values, see:
+#  - https://github.com/golangci/golangci-lint/blob/master/.golangci.example.yml
+#  - https://golangci-lint.run/usage/configuration/
+
+linters:
+  enable:
+  - gofmt
+  - stylecheck
+
+run:
+  timeout: 10m
+  build-tags:
+  - noclibs
+
+linters-settings:
+  stylecheck:
+    checks:
+    - all
+    - -ST1000
+
+issues:
+  include:
+    # don't exclude stylecheck issues about missing or malformed comments on package|func|type|var|const
+    # checks: ST1000,ST1020,ST1021,ST1022 (https://staticcheck.io/docs/checks)
+  - EXC0011
