@@ -39,12 +39,13 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 
 type envAccessor struct {
 	pkgadapter.EnvConfig
-	// Spell defines the Dataweave spell to use on the incoming data at the event payload
+	// Spell defines the Dataweave spell to use on the incoming data at the event payload.
 	Spell string `envconfig:"DW_SPELL" required:"true"`
-	// Spell string `envconfig:"DW_SPELL" required:"true"`
-	// IncomingContentType defines the expected content type of the incoming data
-	IncomingContentType string `envconfig:"CONTENT_TYPE" default:"application/json"`
-	// BridgeIdentifier is the name of the bridge workflow this target is part of
+	// IncomingContentType defines the expected content type of the incoming data.
+	IncomingContentType string `envconfig:"INCOMING_CONTENT_TYPE" default:"application/json"`
+	// OutputContentType defines the content the cloudevent to be sent with the transformed data.
+	OutputContentType string `envconfig:"OUTPUT_CONTENT_TYPE" default:"application/json"`
+	// BridgeIdentifier is the name of the bridge workflow this target is part of.
 	BridgeIdentifier string `envconfig:"EVENTS_BRIDGE_IDENTIFIER"`
 	// CloudEvents responses parametrization
 	CloudEventPayloadPolicy string `envconfig:"EVENTS_PAYLOAD_POLICY" default:"error"`
@@ -57,7 +58,6 @@ type envAccessor struct {
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
-
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
 		targetce.ReplierWithStaticResponseType("io.triggermesh.dataweavetransformation.error"),
@@ -67,8 +67,9 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	}
 
 	return &adapter{
-		spell:       env.Spell,
-		contentType: env.IncomingContentType,
+		spell:               env.Spell,
+		incomingContentType: env.IncomingContentType,
+		outputContentType:   env.OutputContentType,
 
 		sink:     env.Sink,
 		replier:  replier,
@@ -80,8 +81,9 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 var _ pkgadapter.Adapter = (*adapter)(nil)
 
 type adapter struct {
-	spell       string
-	contentType string
+	spell               string
+	incomingContentType string
+	outputContentType   string
 
 	sink     string
 	replier  *targetce.Replier
@@ -93,7 +95,6 @@ type adapter struct {
 // or the context is cancelled.
 func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting Dataweave Transformation Adapter")
-
 	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
@@ -109,8 +110,7 @@ func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 	}
 
 	cn := strings.Replace(tmpfile.Name(), "/app/", "", 1)
-	cmd := `dw -i payload ` + cn + ` "` + a.spell + `"`
-	out, err := exec.Command("bash", "-c", cmd).Output()
+	out, err := exec.Command("/app/.dw/bin/dw", "-i", "payload", cn, a.spell).Output()
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "executing the spell")
 	}
@@ -120,8 +120,9 @@ func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "removing the file")
 	}
 
-	if err := event.SetData(a.contentType, out); err != nil {
+	if err := event.SetData(a.outputContentType, out); err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
+
 	return &event, cloudevents.ResultACK
 }
