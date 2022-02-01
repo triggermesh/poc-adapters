@@ -1,6 +1,6 @@
 # This workflow is ensure that the projects build and lint correctly.
 
-name: buildandlint
+name: lintandbuild
 
 # Controls when the workflow will run
 on:
