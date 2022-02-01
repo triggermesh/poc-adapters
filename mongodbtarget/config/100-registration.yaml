@@ -1,0 +1,23 @@
+apiVersion: extensions.triggermesh.io/v1alpha1
+kind: GenericRegistration
+metadata:
+  name: mongodbtarget
+spec:
+
+  generate:
+    names:
+      kind: MongoDBTarget
+      plural: mongodbtargets
+
+  workload:
+    fromImage:
+      repo: gcr.io/ultra-hologram-297914/mongodbtarget:latest
+
+    parameterOptions:
+      arbitraryParameters: false
+      keyCasing: upper
+
+  configuration:
+    parameters:
+    - name: mongodb_server_url
+      type: string

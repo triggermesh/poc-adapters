@@ -83,10 +83,4 @@ curl -v http://localhost:8080 \
 
 ### Export to run locally
 
-export NAMESPACE=default
-
-export K_LOGGING_CONFIG={}
-
-export K_METRICS_CONFIG={}
-
 export MONGODB_SERVER_URL="mongodb+srv://<user>:<password>@<database_url>/myFirstDatabase"
