@@ -12,15 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: serving.knative.dev/v1
-kind: Service
+apiVersion: components.extensions.triggermesh.io/v1alpha1
+kind: DataweaveTransformation
 metadata:
-  name: dataweavetransformation
+  name: hello-dw
 spec:
-  template:
-    spec:
-      containers:
-        - image: gcr.io/ultra-hologram-297914/dw
-          env:
-            - name: DW_SPELL
-              value: output application/json --- payload filter (item) -> item.age > 17
+  dw_spell: output application/json --- payload filter (item) -> item.age > 17
+  output_content_type: application/json
+  incoming_content_type: application/json

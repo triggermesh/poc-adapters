@@ -1,0 +1,31 @@
+apiVersion: extensions.triggermesh.io/v1alpha1
+kind: GenericRegistration
+metadata:
+  name: dataweavetransformation
+spec:
+
+  generate:
+    names:
+      kind: DataweaveTransformation
+      plural: dataweavetransformations
+
+  workload:
+    fromImage:
+      repo: gcr.io/ultra-hologram-297914/dw:latest
+    formFactor:
+      knativeService:
+        minScale: 1
+        maxScale: 1
+
+    parameterOptions:
+      arbitraryParameters: false
+      keyCasing: upper
+
+  configuration:
+    parameters:
+    - name: dw_spell
+      type: string
+    - name: output_content_type
+      type: string
+    - name: incoming_content_type
+      type: string
