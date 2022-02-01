@@ -25,6 +25,10 @@ jobs:
     - name: checkout
       uses: actions/checkout@v2
 
+    - uses: actions/setup-go@v2
+      with:
+        go-version: '^1.17.0' # The Go version to download (if necessary) and use.
+
     - name: Install golangci-lint
       run: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.18.0
 
