@@ -13,21 +13,24 @@
 # limitations under the License.
 
 FROM ubuntu:latest as builder
-RUN mkdir /app
+WORKDIR /app
 RUN apt-get update && apt-get install wget -y && apt-get install unzip
-RUN mkdir /app/.dw
-RUN cd /app/.dw && wget -c https://github.com/mulesoft-labs/data-weave-cli/releases/download/v1.0.16/dw-1.0.16-Linux && unzip dw-1.0.16-Linux
-RUN chmod +x /app/.dw/bin/dw
+RUN  wget -c https://github.com/mulesoft-labs/data-weave-cli/releases/download/v1.0.16/dw-1.0.16-Linux && unzip dw-1.0.16-Linux
 RUN wget -c https://go.dev/dl/go1.17.6.linux-amd64.tar.gz && tar -C /usr/local -xzf go1.17.6.linux-amd64.tar.gz
+COPY . ./
+ENV PATH=$PATH:/usr/local/go/bin
+RUN cd cmd && go build -o dwadapter
 
-
-FROM builder
+FROM registry.access.redhat.com/ubi8/ubi-minimal
 WORKDIR /app
 ENV DW_HOME=/app/.dw
 ENV DW_LIB_PATH=/app/.dw/libs
 ENV PATH=/app/.dw/bin:$PATH
 ENV PATH=$PATH:/usr/local/go/bin
-COPY . ./
-RUN cd cmd && go build -o /dwadapter
+
+COPY --from=builder /app/cmd/dwadapter /dwadapter
+COPY --from=builder /app/bin/dw /app/.dw/bin/dw
+
+RUN chmod +x /app/.dw/bin/dw
 EXPOSE 8080
 CMD ["/dwadapter"]
