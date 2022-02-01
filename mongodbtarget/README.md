@@ -106,7 +106,3 @@ curl -v http://localhost:8080 \
 | **collection** | string | The value of the collection. |
 | **key** | string | the "Key" value to search  |
 | **value** | string | the "Value" value to search |
-
-### Export to run locally
-
-export MONGODB_SERVER_URL="mongodb+srv://<user>:<password>@<database_url>/myFirstDatabase"
