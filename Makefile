@@ -11,3 +11,11 @@ lint:
 	@cd jqtransformation/cmd && golangci-lint run
 	@cd mongodbtarget/pkg/adapter && golangci-lint run
 	@cd mongodbtarget/cmd && golangci-lint run
+
+build:
+	@cd jqtransformation/cmd && go build
+	@cd mongodbtarget/cmd && go build
+
+clean:
+	@cd jqtransformation/cmd && go clean
+	@cd mongodbtarget/cmd && go clean
