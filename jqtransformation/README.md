@@ -1,54 +1,39 @@
-Steps to debug locally:
+# JQTransformation
+the JQTransformation exposes a service that allows the user to transform a JSON payload
+by using a [JQ](https://devdocs.io/jq/) expression.
 
-1:
-```
-export QUERY=".foo | .."
+## Deploying with Koby
+
+### Prerequisites
+* Ensure that you have installed [Koby](https://github.com/triggermesh/koby) on the target cluster.
+
+### Configuring the JQTransformation CRD with Koby
+The JQTransformation CRD can be configured with [Koby](https://github.com/triggermesh/koby) by applying the provided manifest in `/config/100-registration.yaml`
+```cmd
+kubectl apply -f /config/100-registration.yaml
 ```
 
-2:
-```
-cd jqtransformation/cmd
-go run .
+### Deploying an instance of the JQTransformation
+After updating the `query` spec field with a valid JQ expression, the JQTransformation can now be deployed by applying
+ the provided manifest in `/config/200-deployment.yaml`.
+```cmd
+kubectl apply -f /config/200-deployment.yaml
 ```
 
-3:
+### Interacting with the JQTransformation
+The JQTransformation object will accept any event with a valid JSON payload and transform it using the JQ expression provided in the spec.
+If it was deployed with the example JQ expression, one can try the following example event:
 ```
-curl -v "localhost:8080" \
+curl -v "http://jqtransformations-hello-jq.default.34.133.226.173.sslip.io" \
        -X POST \
        -H "Ce-Id: 536808d3-88be-4077-9d7a-a3f162705f79" \
        -H "Ce-Specversion: 1.0" \
-       -H "Ce-Type: io.triggermesh.sendgrid.email.send" \
+       -H "Ce-Type: io.triggermesh.transform.me" \
        -H "Ce-Source: dev.knative.samples/helloworldsource" \
        -H "Content-Type: application/json" \
        -d '{"foo":"richard@triggermesh.com"}'
 ```
-
-4:
-EXPECTED RESULT:
+and expect a response of:
 ```
-* Connected to localhost (::1) port 8080 (#0)
-> POST / HTTP/1.1
-> Host: localhost:8080
-> User-Agent: curl/7.77.0
-> Accept: */*
-> Ce-Id: 536808d3-88be-4077-9d7a-a3f162705f79
-> Ce-Specversion: 1.0
-> Ce-Type: io.triggermesh.sendgrid.email.send
-> Ce-Source: dev.knative.samples/helloworldsource
-> Content-Type: application/json
-> Content-Length: 33
-> 
-* Mark bundle as not supporting multiuse
-< HTTP/1.1 200 OK
-< Ce-Id: 536808d3-88be-4077-9d7a-a3f162705f79
-< Ce-Source: dev.knative.samples/helloworldsource
-< Ce-Specversion: 1.0
-< Ce-Time: 2022-01-24T18:10:40.953971Z
-< Ce-Type: io.triggermesh.sendgrid.email.send
-< Content-Length: 25
-< Content-Type: application/json
-< Date: Mon, 24 Jan 2022 18:10:40 GMT
-< 
-* Connection #0 to host localhost left intact
 "richard@triggermesh.com"
 ```
