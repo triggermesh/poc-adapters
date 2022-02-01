@@ -1,0 +1,23 @@
+apiVersion: extensions.triggermesh.io/v1alpha1
+kind: GenericRegistration
+metadata:
+  name: jqtransformation
+spec:
+
+  generate:
+    names:
+      kind: JQTransformation
+      plural: jqtransformations
+
+  workload:
+    fromImage:
+      repo: gcr.io/ultra-hologram-297914/jqt:latest
+
+    parameterOptions:
+      arbitraryParameters: false
+      keyCasing: upper
+
+  configuration:
+    parameters:
+    - name: query
+      type: string
