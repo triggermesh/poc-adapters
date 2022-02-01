@@ -3,14 +3,9 @@
 name: lintandbuild
 
 # Controls when the workflow will run
-on:
+on: [push, pull_request]
 
-  push:
-    branches:
-    - master
-    - develop
 
-  workflow_dispatch:
 
 
 jobs:
