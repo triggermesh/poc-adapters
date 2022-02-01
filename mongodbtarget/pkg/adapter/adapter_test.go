@@ -50,9 +50,9 @@ const (
 // Insert the tInsert test data into a mongodb table via sending an event of type io.triggermesh.mongodb.insert
 func TestInsert(t *testing.T) {
 	ctx := context.Background()
-	serverUrl := os.Getenv("MONGODB_SERVER_URL")
-	require.NotEmpty(t, serverUrl, "MONGODB_SERVER_URL must be set")
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(serverUrl))
+	serverURL := os.Getenv("MONGODB_SERVER_URL")
+	require.NotEmpty(t, serverURL, "MONGODB_SERVER_URL must be set")
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(serverURL))
 	require.NotNil(t, client, "client should not be nil")
 	require.Nil(t, err, "error should be nil")
 	testCases := map[string]struct {
@@ -75,7 +75,7 @@ func TestInsert(t *testing.T) {
 				mclient:  tc.mClient,
 			}
 
-			mA.dispatch(tc.inEvent)
+			_, _ = mA.dispatch(tc.inEvent)
 
 			// find the inserted values
 			episodesFiltered := findInsertedValues("test", "testvalue", client, t)
@@ -89,9 +89,9 @@ func TestInsert(t *testing.T) {
 // Update the previously inserted tInsert test data into a mongodb table via sending an event of type io.triggermesh.mongodb.update
 func TestUpdate(t *testing.T) {
 	ctx := context.Background()
-	serverUrl := os.Getenv("MONGODB_SERVER_URL")
-	require.NotEmpty(t, serverUrl, "MONGODB_SERVER_URL must be set")
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(serverUrl))
+	serverURL := os.Getenv("MONGODB_SERVER_URL")
+	require.NotEmpty(t, serverURL, "MONGODB_SERVER_URL must be set")
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(serverURL))
 	require.NotNil(t, client, "client should not be nil")
 	require.Nil(t, err, "error should be nil")
 	testCases := map[string]struct {
@@ -114,7 +114,7 @@ func TestUpdate(t *testing.T) {
 				mclient:  tc.mClient,
 			}
 
-			mA.dispatch(tc.inEvent)
+			_, _ = mA.dispatch(tc.inEvent)
 
 			// find the updated values
 			episodesFiltered := findInsertedValues("partstore", "UP FOR GRABS", client, t)
@@ -129,9 +129,9 @@ func TestUpdate(t *testing.T) {
 // by testing the consumtion of an event of type io.triggermesh.mongodb.query.kv
 func TestQueryKV(t *testing.T) {
 	ctx := context.Background()
-	serverUrl := os.Getenv("MONGODB_SERVER_URL")
-	require.NotEmpty(t, serverUrl, "MONGODB_SERVER_URL must be set")
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(serverUrl))
+	serverURL := os.Getenv("MONGODB_SERVER_URL")
+	require.NotEmpty(t, serverURL, "MONGODB_SERVER_URL must be set")
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(serverURL))
 	require.NotNil(t, client, "client should not be nil")
 	require.Nil(t, err, "error should be nil")
 	testCases := map[string]struct {
@@ -160,7 +160,7 @@ func TestQueryKV(t *testing.T) {
 			assert.True(t, found, "should contain `UP FOR GRABS`")
 		})
 	}
-	client.Database(tDatabase).Collection(tCollection).Drop(ctx)
+	_ = client.Database(tDatabase).Collection(tCollection).Drop(ctx)
 }
 
 func findInsertedValues(key, value string, c *mongo.Client, t *testing.T) []bson.M {

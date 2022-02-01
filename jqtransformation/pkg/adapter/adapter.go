@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// Package jqtransformation implements a CloudEvents adapter that transforms a CloudEvent
+// using a JQ query.
 package jqtransformation
 
 import (
@@ -65,7 +67,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		logger.Panicf("Error creating query: %v", err)
 	}
 
-	return &adapter{
+	return &jqadapter{
 		query: query,
 
 		sink:     env.Sink,
@@ -75,9 +77,9 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	}
 }
 
-var _ pkgadapter.Adapter = (*adapter)(nil)
+var _ pkgadapter.Adapter = (*jqadapter)(nil)
 
-type adapter struct {
+type jqadapter struct {
 	query *gojq.Query
 
 	sink     string
@@ -88,12 +90,12 @@ type adapter struct {
 
 // Start is a blocking function and will return if an error occurs
 // or the context is cancelled.
-func (a *adapter) Start(ctx context.Context) error {
+func (a *jqadapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting JQTransformation Adapter")
 	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
-func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
+func (a *jqadapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	var data map[string]interface{}
 	var qd interface{}
 	if err := event.DataAs(&data); err != nil {
