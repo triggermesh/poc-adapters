@@ -18,8 +18,10 @@ package dataweavetransformation
 
 import (
 	"context"
+	"io/ioutil"
 	"os"
 	"os/exec"
+	"strings"
 
 	"go.uber.org/zap"
 
@@ -96,19 +98,24 @@ func (a *adapter) Start(ctx context.Context) error {
 }
 
 func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
-	fileName := "event.json"
-	err := os.WriteFile(fileName, event.Data(), 0644)
+	var err error
+	tmpfile, err := ioutil.TempFile("/app", "*.json")
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating the file")
 	}
 
-	cmd := `dw -i payload ` + fileName + ` "` + a.spell + `"`
+	if _, err := tmpfile.Write(event.Data()); err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "writing to the file")
+	}
+
+	cn := strings.Replace(tmpfile.Name(), "/app/", "", 1)
+	cmd := `dw -i payload ` + cn + ` "` + a.spell + `"`
 	out, err := exec.Command("bash", "-c", cmd).Output()
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "executing the spell")
 	}
 
-	err = os.Remove(fileName)
+	err = os.Remove(tmpfile.Name())
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "removing the file")
 	}
