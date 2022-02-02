@@ -21,6 +21,6 @@ spec:
     schedule: '*/1 * * * *'
     sink:
       ref:
-        apiVersion: components.extensions.triggermesh.io/v1alpha1
-        kind: JQTransformation
-        name: hello-jq
+        apiVersion: serving.knative.dev/v1
+        kind: Service
+        name: jqtransformations-hello-jq

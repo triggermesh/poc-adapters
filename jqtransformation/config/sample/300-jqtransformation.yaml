@@ -18,3 +18,8 @@ metadata:
   name: hello-jq
 spec:
   query: .foo | ..
+  sink:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: event-display
