@@ -119,8 +119,8 @@ func (a *jqadapter) dispatch(ctx context.Context, event cloudevents.Event) (*clo
 	}
 
 	if a.sink != "" {
-		if err := a.ceClient.Send(ctx, event); err != nil {
-			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+		if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, result, "sending the cloudevent to the sink")
 		}
 		return nil, cloudevents.ResultACK
 	}
