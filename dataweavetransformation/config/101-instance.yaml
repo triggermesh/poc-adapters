@@ -20,3 +20,8 @@ spec:
   dw_spell: output application/json --- payload filter (item) -> item.age > 17
   output_content_type: application/json
   incoming_content_type: application/json
+  sink:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: event-display

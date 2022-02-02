@@ -1,5 +1,5 @@
 apiVersion: extensions.triggermesh.io/v1alpha1
-kind: GenericRegistration
+kind: KnativeSourceRegistration
 metadata:
   name: dataweavetransformation
 spec:
