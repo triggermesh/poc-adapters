@@ -30,3 +30,7 @@ clean:
 	@cd jqtransformation/cmd && go clean
 	@cd mongodbtarget/cmd && go clean
 	@cd dataweavetransformation/cmd && go clean
+
+test:
+	@cd jqtransformation/pkg/adapter && go test
+	@cd mongodbtarget/pkg/adapter && go test
