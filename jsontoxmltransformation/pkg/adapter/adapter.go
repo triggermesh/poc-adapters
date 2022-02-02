@@ -25,7 +25,6 @@ import (
 	"encoding/xml"
 	"io"
 
-	"github.com/itchyny/gojq"
 	"vimagination.zapto.org/json2xml"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
@@ -76,8 +75,6 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 var _ pkgadapter.Adapter = (*jqadapter)(nil)
 
 type jqadapter struct {
-	query *gojq.Query
-
 	sink     string
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
@@ -102,7 +99,10 @@ func (a *jqadapter) dispatch(ctx context.Context, event cloudevents.Event) (*clo
 	}
 
 	var x interface{}
-	xml.Encode(x)
+	if err := xml.Encode(x); err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "encoding the data")
+	}
+
 	if err := event.SetData(cloudevents.ApplicationXML, op.Bytes()); err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
