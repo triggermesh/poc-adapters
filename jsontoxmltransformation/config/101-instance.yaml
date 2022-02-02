@@ -17,3 +17,20 @@ kind: JSONToXMLTransformation
 metadata:
   name: hello-jtx
 spec:
+  sink:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: event-display
+
+---
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: event-display
+spec:
+  template:
+    spec:
+      containers:
+      - image: gcr.io/knative-releases/knative.dev/eventing/cmd/event_display
