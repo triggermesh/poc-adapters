@@ -1,5 +1,5 @@
 apiVersion: extensions.triggermesh.io/v1alpha1
-kind: GenericRegistration
+kind: KnativeSourceRegistration
 metadata:
   name: jqtransformation
 spec:
@@ -24,4 +24,6 @@ spec:
   configuration:
     parameters:
     - name: query
+      type: string
+    - name: target
       type: string
