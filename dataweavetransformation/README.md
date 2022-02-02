@@ -14,7 +14,8 @@ kubectl apply -f /config/100-registration.yaml
 ```
 
 ### Deploying an instance of the DataweaveTransformation
-After updating the `dw_spell`, `output_content_type`, and `incoming_content_type` spec fields. the DataweaveTransformation can now be deployed by applying the provided manifest in `/config/200-deployment.yaml`.
+After updating the `dw_spell`, `output_content_type`, and `incoming_content_type` spec fields. the DataweaveTransformation can now be deployed by applying the provided manifest in `/config/200-deployment.yaml`. Note that the DataweaveTransformation must be deployed with a configured sink. For example purposes
+the example deployment comes pre-configured with an event-display.
 ```cmd
 kubectl apply -f /config/200-deployment.yaml
 ```
@@ -26,7 +27,7 @@ If it was deployed with the example Dataweave spell, one can try the following e
 ```cmd
 curl --location --request POST  'http://dataweavetransformations-hello-dw.default.34.133.226.173.sslip.io' \
 --header 'Ce-Specversion: 1.0' \
---header 'Ce-Type: io.triggermesh.mongodb.query.kv' \
+--header 'Ce-Type: io.triggermesh.sample.event' \
 --header 'Ce-Id: 123123' \
 --header 'Ce-Source: ser' \
 --header 'Content-Type: application/json' \
@@ -53,8 +54,17 @@ curl --location --request POST  'http://dataweavetransformations-hello-dw.defaul
   }
 ]'
 ```
-and expect a response of:
+Expecting a response like this inside the logs of the event-display:
 ```
+☁️  cloudevents.Event
+Context Attributes,
+  specversion: 1.0
+  type: io.triggermesh.sample.event
+  source: ser
+  id: 8fca9e2d-d3ec-495d-a43d-3f00b3b73740
+  time: 2022-02-02T17:55:00.319205486Z
+  datacontenttype: application/json
+Data,
 [
   {
     "name": "User1",

@@ -15,7 +15,9 @@ kubectl apply -f /config/100-registration.yaml
 
 ### Deploying an instance of the JQTransformation
 After updating the `query` spec field with a valid JQ expression, the JQTransformation can now be deployed by applying
- the provided manifest in `/config/200-deployment.yaml`.
+ the provided manifest in `/config/200-deployment.yaml`. Note that the JQTransformation must be deployed with a configured sink. For example purposes
+the example deployment comes pre-configured with an event-display.
+
 ```cmd
 kubectl apply -f /config/200-deployment.yaml
 ```
@@ -33,7 +35,17 @@ curl -v "http://jqtransformations-hello-jq.default.34.133.226.173.sslip.io" \
        -H "Content-Type: application/json" \
        -d '{"foo":"richard@triggermesh.com"}'
 ```
-and expect a response of:
+
+Expecting a response like this inside the logs of the event-display:
 ```
-"richard@triggermesh.com"
+☁️  cloudevents.Event
+Context Attributes,
+  specversion: 1.0
+  type: dev.knative.sources.ping
+  source: /apis/v1/namespaces/j2x/pingsources/cj
+  id: 8fca9e2d-d3ec-495d-a43d-3f00b3b73740
+  time: 2022-02-02T17:55:00.319205486Z
+  datacontenttype: application/json
+Data,
+  "richard@triggermesh.com"
 ```
