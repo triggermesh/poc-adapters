@@ -1,4 +1,4 @@
-module github.com/triggermesh/transformers/dataweavetransformation
+module github.com/triggermesh/poc-adapters/dataweavetransformation
 
 go 1.17
 

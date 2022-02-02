@@ -17,7 +17,7 @@ limitations under the License.
 package main
 
 import (
-	dataweavetransformation "github.com/triggermesh/transformers/dataweavetransformation/pkg/adapter"
+	dataweavetransformation "github.com/triggermesh/poc-adapters/dataweavetransformation/pkg/adapter"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 

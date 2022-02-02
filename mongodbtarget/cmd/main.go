@@ -17,7 +17,7 @@ limitations under the License.
 package main
 
 import (
-	mongodbtarget "github.com/triggermesh/transformers/mongodbtarget/pkg/adapter"
+	mongodbtarget "github.com/triggermesh/poc-adapters/mongodbtarget/pkg/adapter"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 

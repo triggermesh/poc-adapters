@@ -17,7 +17,7 @@ limitations under the License.
 package main
 
 import (
-	jqtransformation "github.com/triggermesh/transformers/jqtransformation/pkg/adapter"
+	jqtransformation "github.com/triggermesh/poc-adapters/jqtransformation/pkg/adapter"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 

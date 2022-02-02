@@ -1,4 +1,4 @@
-module github.com/triggermesh/transformers/mongodbtarget
+module github.com/triggermesh/poc-adapters/mongodbtarget
 
 go 1.17
 

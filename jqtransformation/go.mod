@@ -1,4 +1,4 @@
-module github.com/triggermesh/transformers/jqtransformation
+module github.com/triggermesh/poc-adapters/jqtransformation
 
 go 1.17
 
