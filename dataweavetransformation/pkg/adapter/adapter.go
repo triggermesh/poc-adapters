@@ -126,5 +126,12 @@ func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
+	if a.sink != "" {
+		if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "sending the cloudevent to the sink")
+		}
+		return nil, cloudevents.ResultACK
+	}
+
 	return &event, cloudevents.ResultACK
 }
