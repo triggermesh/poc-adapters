@@ -48,3 +48,4 @@ clean:
 test:
 	@cd jqtransformation/pkg/adapter && go test
 	@cd mongodbtarget/pkg/adapter && go test
+	@cd jsontoxmltransformation/pkg/adapter && go test
