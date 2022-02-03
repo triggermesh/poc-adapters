@@ -76,8 +76,8 @@ Expecting a response like this inside the logs of the event-display:
 ☁️  cloudevents.Event
 Context Attributes,
   specversion: 1.0
-  type: dev.knative.sources.ping
-  source: /apis/v1/namespaces/dw/pingsources/cj
+  type: io.triggermesh.sample.event
+  source: ser
   id: 4c1a3770-cc4b-46b1-94b8-f50f9e918c50
   time: 2022-02-03T19:25:00.094490019Z
   datacontenttype: application/json
