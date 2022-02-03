@@ -110,14 +110,14 @@ func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 	var err error
 	var tmpfile *os.File
 	if a.incomingContentType == "application/json" {
-		tmpfile, err = ioutil.TempFile("/app", "*.xml")
+		tmpfile, err = ioutil.TempFile("/app", "*.json")
 		if err != nil {
 			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating the file")
 		}
 	}
 
 	if a.incomingContentType == "application/xml" {
-		tmpfile, err = ioutil.TempFile("/app", "*.json")
+		tmpfile, err = ioutil.TempFile("/app", "*.xml")
 		if err != nil {
 			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating the file")
 		}
