@@ -21,17 +21,3 @@ spec:
     spec:
       containers:
       - image: gcr.io/knative-releases/knative.dev/eventing/cmd/event_display
-
----
-
-kind: Trigger
-apiVersion: eventing.knative.dev/v1
-metadata:
-  name: event-display
-spec:
-  broker: demo
-  subscriber:
-    ref:
-      apiVersion: serving.knative.dev/v1
-      kind: Service
-      name: event-display

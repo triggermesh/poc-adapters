@@ -73,16 +73,19 @@ func (a *mongodbAdapter) dispatch(event cloudevents.Event) (*cloudevents.Event, 
 		if err := a.insert(event, ctx); err != nil {
 			return a.reportError("error invoking function: ", err)
 		}
+
 	case "io.triggermesh.mongodb.query.kv":
 		resp, err := a.kvQuery(event, ctx)
 		if err != nil {
 			return a.reportError("error invoking kvQuery function: ", err)
 		}
+
 		return resp, nil
 	case "io.triggermesh.mongodb.update":
 		if err := a.update(event, ctx); err != nil {
 			return a.reportError("error invoking update function: ", err)
 		}
+
 	default:
 		return a.reportError("event type not supported ", nil)
 	}
@@ -134,9 +137,9 @@ func (a *mongodbAdapter) insert(e cloudevents.Event, ctx context.Context) error 
 		if err != nil {
 			return err
 		}
-		id := res.InsertedID
+
 		a.logger.Infof("Posted data id:")
-		a.logger.Info(id)
+		a.logger.Info(res.InsertedID)
 	}
 
 	return nil
@@ -171,8 +174,9 @@ func (a *mongodbAdapter) reportError(msg string, err error) (*cloudevents.Event,
 	responseEvent.SetSource("io.triggermesh.mongodb")
 	responseEvent.SetSubject("error")
 	responseEvent.SetDataContentType(cloudevents.ApplicationJSON)
-	if result := responseEvent.SetData(cloudevents.ApplicationJSON, msg); !cloudevents.IsACK(result) {
+	if err := responseEvent.SetData(cloudevents.ApplicationJSON, msg); err != nil {
 		a.logger.Errorw("could not set error response data")
 	}
+
 	return &responseEvent, cloudevents.NewHTTPResult(http.StatusInternalServerError, msg)
 }
