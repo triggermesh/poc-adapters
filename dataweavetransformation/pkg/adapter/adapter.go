@@ -69,7 +69,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
 
-	errs := registerAndPopulateSpell(env.Spell, logger)
+	errs := registerAndPopulateSpell(env.Spell)
 	if errs != nil {
 		logger.Panicf("Error creating spell: %v", errs)
 	}
@@ -143,7 +143,7 @@ func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 	return &event, cloudevents.ResultACK
 }
 
-func registerAndPopulateSpell(spell string, logger *zap.SugaredLogger) error {
+func registerAndPopulateSpell(spell string) error {
 	if err := exec.Command("dw", "--new-spell", "custom").Run(); err != nil {
 		return err
 	}
