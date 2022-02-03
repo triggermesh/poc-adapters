@@ -23,6 +23,7 @@ RUN cd cmd && go build -o dwadapter
 
 FROM registry.access.redhat.com/ubi8/ubi-minimal
 WORKDIR /app
+RUN microdnf install git
 ENV DW_HOME=/app/.dw
 ENV DW_LIB_PATH=/app/.dw/libs
 ENV PATH=/app/.dw/bin:$PATH

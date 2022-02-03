@@ -19,6 +19,7 @@ limitations under the License.
 package dataweavetransformation
 
 import (
+	"bytes"
 	"context"
 	"io/ioutil"
 	"os"
@@ -42,7 +43,7 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 	// Spell defines the Dataweave spell to use on the incoming data at the event payload.
-	Spell string `envconfig:"DW_SPELL" required:"true"`
+	Spell string `envconfig:"DW_SPELL" required:true`
 	// IncomingContentType defines the expected content type of the incoming data.
 	IncomingContentType string `envconfig:"INCOMING_CONTENT_TYPE" default:"application/json"`
 	// OutputContentType defines the content the cloudevent to be sent with the transformed data.
@@ -66,6 +67,11 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
+	}
+
+	errs := registerAndPopulateSpell(env.Spell, logger)
+	if errs != nil {
+		logger.Panicf("Error creating spell: %v", errs)
 	}
 
 	return &adapter{
@@ -112,7 +118,7 @@ func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 	}
 
 	cn := strings.Replace(tmpfile.Name(), "/app/", "", 1)
-	out, err := exec.Command("/app/.dw/bin/dw", "-i", "payload", cn, a.spell).Output()
+	out, err := exec.Command("dw", "-i", "payload", cn, "--local-spell", "custom").Output()
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "executing the spell")
 	}
@@ -122,7 +128,8 @@ func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "removing the file")
 	}
 
-	if err := event.SetData(a.outputContentType, out); err != nil {
+	cleaned := bytes.Trim(out, "Running local spell")
+	if err := event.SetData(a.outputContentType, cleaned); err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
@@ -134,4 +141,16 @@ func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 	}
 
 	return &event, cloudevents.ResultACK
+}
+
+func registerAndPopulateSpell(spell string, logger *zap.SugaredLogger) error {
+	if err := exec.Command("dw", "--new-spell", "custom").Run(); err != nil {
+		return err
+	}
+
+	if err := ioutil.WriteFile("./custom/src/Main.dwl", []byte(spell), 0644); err != nil {
+		return err
+	}
+
+	return nil
 }
