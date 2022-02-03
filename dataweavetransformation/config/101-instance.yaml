@@ -17,7 +17,15 @@ kind: DataweaveTransformation
 metadata:
   name: hello-dw
 spec:
-  dw_spell: output application/json --- payload filter (item) -> item.age > 17
+  dw_spell: |-
+      %dw 2.0
+      output application/json
+      ---
+      items: payload.books map (item, index) -> {
+            book: item mapObject (value, key) -> {
+            (upper(key)): value
+            }
+      }
   output_content_type: application/json
   incoming_content_type: application/json
   sink:
