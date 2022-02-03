@@ -27,7 +27,7 @@ If it was deployed with the example Dataweave spell, one can try the following e
 ```cmd
 curl --location --request POST 'http://dataweavetransformations-hello-dw.dw.35.202.146.138.sslip.io' \
 --header 'Ce-Specversion: 1.0' \
---header 'Ce-Type: io.triggermesh.mongodb.query.kv' \
+--header 'Ce-Type: io.triggermesh.sample.event' \
 --header 'Ce-Id: 123123' \
 --header 'Ce-Source: ser' \
 --header 'Content-Type: application/json' \
