@@ -108,9 +108,19 @@ func (a *adapter) Start(ctx context.Context) error {
 
 func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	var err error
-	tmpfile, err := ioutil.TempFile("/app", "*.json")
-	if err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating the file")
+	var tmpfile *os.File
+	if a.incomingContentType == "application/json" {
+		tmpfile, err = ioutil.TempFile("/app", "*.xml")
+		if err != nil {
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating the file")
+		}
+	}
+
+	if a.incomingContentType == "application/xml" {
+		tmpfile, err = ioutil.TempFile("/app", "*.json")
+		if err != nil {
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating the file")
+		}
 	}
 
 	if _, err := tmpfile.Write(event.Data()); err != nil {
