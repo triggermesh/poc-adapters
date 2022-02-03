@@ -25,54 +25,108 @@ kubectl apply -f /config/200-deployment.yaml
 The DataweaveTransformation object will accept any event and use the Dataweave spell provided in the spec to transform it.
 If it was deployed with the example Dataweave spell, one can try the following example event:
 ```cmd
-curl --location --request POST  'http://dataweavetransformations-hello-dw.default.34.133.226.173.sslip.io' \
+curl --location --request POST 'http://dataweavetransformations-hello-dw.dw.35.202.146.138.sslip.io' \
 --header 'Ce-Specversion: 1.0' \
---header 'Ce-Type: io.triggermesh.sample.event' \
+--header 'Ce-Type: io.triggermesh.mongodb.query.kv' \
 --header 'Ce-Id: 123123' \
 --header 'Ce-Source: ser' \
 --header 'Content-Type: application/json' \
---data-raw '[
-  {
-    "name": "User1",
-    "age": 19
-  },
-  {
-    "name": "User2",
-    "age": 18
-  },
-  {
-    "name": "User3",
-    "age": 15
-  },
-  {
-    "name": "User4",
-    "age": 13
-  },
-  {
-    "name": "User5",
-    "age": 16
-  }
-]'
+--data-raw '{
+    "books": [
+      {
+        "-category": "cooking",
+        "title":"Everyday Italian",
+        "author": "Giada De Laurentiis",
+        "year": "2005",
+        "price": "30.00"
+      },
+      {
+        "-category": "children",
+        "title": "Harry Potter",
+        "author": "J K. Rowling",
+        "year": "2005",
+        "price": "29.99"
+      },
+      {
+        "-category": "web",
+        "title":  "XQuery Kick Start",
+        "author": [
+          "James McGovern",
+          "Per Bothner",
+          "Kurt Cagle",
+          "James Linn",
+          "Vaidyanathan Nagarajan"
+        ],
+        "year": "2003",
+        "price": "49.99"
+      },
+      {
+        "-category": "web",
+        "-cover": "paperback",
+        "title": "Learning XML",
+        "author": "Erik T. Ray",
+        "year": "2003",
+        "price": "39.95"
+      }
+    ]
+}'
 ```
 Expecting a response like this inside the logs of the event-display:
 ```
 ☁️  cloudevents.Event
 Context Attributes,
   specversion: 1.0
-  type: io.triggermesh.sample.event
-  source: ser
-  id: 8fca9e2d-d3ec-495d-a43d-3f00b3b73740
-  time: 2022-02-02T17:55:00.319205486Z
+  type: dev.knative.sources.ping
+  source: /apis/v1/namespaces/dw/pingsources/cj
+  id: 4c1a3770-cc4b-46b1-94b8-f50f9e918c50
+  time: 2022-02-03T19:25:00.094490019Z
   datacontenttype: application/json
 Data,
-[
   {
-    "name": "User1",
-    "age": 19
-  },
-  {
-    "name": "User2",
-    "age": 18
+    "items": [
+      {
+        "book": {
+          "-CATEGORY": "cooking",
+          "TITLE": "Everyday Italian",
+          "AUTHOR": "Giada De Laurentiis",
+          "YEAR": "2005",
+          "PRICE": "30.00"
+        }
+      },
+      {
+        "book": {
+          "-CATEGORY": "children",
+          "TITLE": "Harry Potter",
+          "AUTHOR": "J K. Rowling",
+          "YEAR": "2005",
+          "PRICE": "29.99"
+        }
+      },
+      {
+        "book": {
+          "-CATEGORY": "web",
+          "TITLE": "XQuery Kick Start",
+          "AUTHOR": [
+            "James McGovern",
+            "Per Bothner",
+            "Kurt Cagle",
+            "James Linn",
+            "Vaidyanathan Nagarajan"
+          ],
+          "YEAR": "2003",
+          "PRICE": "49.99"
+        }
+      },
+      {
+        "book": {
+          "-CATEGORY": "web",
+          "-COVER": "paperback",
+          "TITLE": "Learning XML",
+          "AUTHOR": "Erik T. Ray",
+          "YEAR": "2003",
+          "PRICE": "39.95"
+        }
+      }
+    ]
   }
-]
 ```
