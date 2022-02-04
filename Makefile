@@ -18,14 +18,14 @@ delete:
 	@cd jsontoxmltransformation/config && kubectl delete -f 100-registration.yaml
 # Lint the adapters.
 lint:
-	@cd jqtransformation/pkg/adapter && golangci-lint run
-	@cd jqtransformation/cmd && golangci-lint run
-	@cd mongodbtarget/pkg/adapter && golangci-lint run
-	@cd mongodbtarget/cmd && golangci-lint run
-	@cd dataweavetransformation/pkg/adapter && golangci-lint run
-	@cd dataweavetransformation/cmd && golangci-lint run
-	@cd jsontoxmltransformation/pkg/adapter && golangci-lint run
-	@cd jsontoxmltransformation/cmd && golangci-lint run
+	@cd jqtransformation/pkg/adapter && golangci-lint run --deadline 2m
+	@cd jqtransformation/cmd && golangci-lint run  --deadline 2m
+	@cd mongodbtarget/pkg/adapter && golangci-lint run  --deadline 2m
+	@cd mongodbtarget/cmd && golangci-lint run  --deadline 2m
+	@cd dataweavetransformation/pkg/adapter && golangci-lint run  --deadline 2m
+	@cd dataweavetransformation/cmd && golangci-lint run  --deadline 2m
+	@cd jsontoxmltransformation/pkg/adapter && golangci-lint run  --deadline 2m
+	@cd jsontoxmltransformation/cmd && golangci-lint run  --deadline 2m
 # Build the adapters.
 build:
 	@cd jqtransformation/cmd && go build
