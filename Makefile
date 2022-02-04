@@ -4,18 +4,21 @@ image:
 	@cd mongodbtarget && gcloud builds submit --tag gcr.io/ultra-hologram-297914/mongodbtarget
 	@cd dataweavetransformation && gcloud builds submit --tag gcr.io/ultra-hologram-297914/dw
 	@cd jsontoxmltransformation && gcloud builds submit --tag gcr.io/ultra-hologram-297914/jtx
+	@cd javascript && gcloud builds submit --tag gcr.io/ultra-hologram-297914/js
 # Apply the Koby manifests for the adapters.
 apply:
 	@cd jqtransformation/config && kubectl apply -f 100-registration.yaml
 	@cd mongodbtarget/config && kubectl apply -f 100-registration.yaml
 	@cd dataweavetransformation/config && kubectl apply -f 100-registration.yaml
 	@cd jsontoxmltransformation/config && kubectl apply -f 100-registration.yaml
+	@cd javascript/config && kubectl apply -f 100-registration.yaml
 # Delete the Koby manifests for the adapters.
 delete:
 	@cd jqtransformation/config && kubectl delete -f 100-registration.yaml
 	@cd mongodbtarget/config && kubectl delete -f 100-registration.yaml
 	@cd dataweavetransformation/config && kubectl delete -f 100-registration.yaml
 	@cd jsontoxmltransformation/config && kubectl delete -f 100-registration.yaml
+	@cd javascript/config && kubectl delete -f 100-registration.yaml
 # Lint the adapters.
 lint:
 	@cd jqtransformation/pkg/adapter && golangci-lint run --deadline 2m

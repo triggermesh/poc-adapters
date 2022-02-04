@@ -1,0 +1,10 @@
+{
+  "name": "javascript",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "cloudevents": "^5.3.1",
+    "express": "^4.17.2"
+  }
+}
