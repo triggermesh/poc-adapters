@@ -25,5 +25,3 @@ spec:
     parameters:
     - name: query
       type: string
-    - name: target
-      type: string
