@@ -13,8 +13,24 @@
 # limitations under the License.
 
 apiVersion: components.extensions.triggermesh.io/v1alpha1
-kind: JQTransformation
+kind: JavascriptAdapter
 metadata:
-  name: hello-jq
+  name: hello-js
 spec:
-  query: .foo | ..
+  sink:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: event-display
+
+---
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: event-display
+spec:
+  template:
+    spec:
+      containers:
+      - image: gcr.io/knative-releases/knative.dev/eventing/cmd/event_display
