@@ -25,6 +25,15 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 
 type envAccessor struct {
 	pkgadapter.EnvConfig
-
+	// ServerURL is the connection string to the MongoDB server.
+	// ex: mongodb+srv://<user>:<password>@<database_url>/myFirstDatabase
 	ServerURL string `envconfig:"MONGODB_SERVER_URL" required:"true"`
+	// DefaultDatabase defines a default database to interact with. If another
+	// database is specified in an incoming event, the event-specified database will
+	// be used in the request, effectively overwriting this one.
+	DefaultDatabase string `envconfig:"MONGODB_DEFAULT_DATABASE" required:"true"`
+	// DefaultCollection defines a default collection to interact with. If another
+	// collection is specified in an incoming event, the event-specified collection will
+	// be used in the request, effectively overwriting this one.
+	DefaultCollection string `envconfig:"MONGODB_DEFAULT_COLLECTION" required:"true"`
 }
