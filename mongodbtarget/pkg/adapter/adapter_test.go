@@ -40,12 +40,55 @@ const (
 	tCollection = "test"
 	tDatabase   = "test"
 
-	tInsert = `{"database":"test","collection": "test","mapStrVal":{"test":"testvalue","test2":"test3"}}`
-	tUpdate = `{"database":"test","collection": "test","searchKey":"test","searchValue":"testvalue","updateKey":"partstore","updateValue":"UP FOR GRABS"}`
-	tQuery  = `{"database":"test","Collection": "test","key":"partstore","value":"UP FOR GRABS"}`
+	tArbitraryInstert = `{"test":"testvalue","test2":"test3"}`
+	tInsert           = `{"database":"test","collection": "test","mapStrVal":{"test":"testvalue","test2":"test3"}}`
+	tUpdate           = `{"database":"test","collection": "test","searchKey":"test","searchValue":"testvalue","updateKey":"partstore","updateValue":"UP FOR GRABS"}`
+	tQuery            = `{"database":"test","Collection": "test","key":"partstore","value":"UP FOR GRABS"}`
 )
 
 // requires the enviroment variable `MONGODB_SERVER_URL` to contain a valid mongodb connection string
+
+// Insert the tInsert test data into a mongodb table via sending an arbitrary event type
+func TestArbitraryEvent(t *testing.T) {
+	ctx := context.Background()
+	serverURL := os.Getenv("MONGODB_SERVER_URL")
+	require.NotEmpty(t, serverURL, "MONGODB_SERVER_URL must be set")
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(serverURL))
+	require.NotNil(t, client, "client should not be nil")
+	require.Nil(t, err, "error should be nil")
+	testCases := map[string]struct {
+		inEvent cloudevents.Event
+		mClient *mongo.Client
+	}{
+		"Consume event of type io.triggermesh.mongodb.arbitrary": {
+			inEvent: newCloudEvent(tArbitraryInstert, "io.triggermesh.arbitrary"),
+			mClient: client,
+		},
+	}
+
+	for n, tc := range testCases {
+		t.Run(n, func(t *testing.T) {
+			ceClient := adaptertest.NewTestClient()
+			mA := &mongodbAdapter{
+				defaultDatabase:   tDatabase,
+				defaultCollection: tCollection,
+
+				logger:   logtesting.TestLogger(t),
+				ceClient: ceClient,
+				mclient:  tc.mClient,
+			}
+
+			_, _ = mA.dispatch(tc.inEvent)
+
+			// find the inserted values
+			episodesFiltered := findInsertedValues("test", "testvalue", client, t)
+			assert.Equal(t, 1, len(episodesFiltered), "should contain 1")
+			assert.Equal(t, "testvalue", string(episodesFiltered[0]["test"].(string)), "should contain `testvalue`")
+
+		})
+	}
+	_ = client.Database(tDatabase).Collection(tCollection).Drop(ctx)
+}
 
 // Insert the tInsert test data into a mongodb table via sending an event of type io.triggermesh.mongodb.insert
 func TestInsert(t *testing.T) {
