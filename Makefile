@@ -1,10 +1,10 @@
 # Create the contianer images for the adapters.
 image:
-	@cd jqtransformation && gcloud builds submit --tag gcr.io/ultra-hologram-297914/jqt
-	@cd mongodbtarget && gcloud builds submit --tag gcr.io/ultra-hologram-297914/mongodbtarget
-	@cd dataweavetransformation && gcloud builds submit --tag gcr.io/ultra-hologram-297914/dw
-	@cd jsontoxmltransformation && gcloud builds submit --tag gcr.io/ultra-hologram-297914/jtx
-	@cd javascript && gcloud builds submit --tag gcr.io/ultra-hologram-297914/js
+	@cd jqtransformation && gcloud builds submit --tag gcr.io/triggermesh/jqt
+	@cd mongodbtarget && gcloud builds submit --tag gcr.io/triggermesh/mongodbtarget
+	@cd dataweavetransformation && gcloud builds submit --tag gcr.io/triggermesh/dw
+	@cd jsontoxmltransformation && gcloud builds submit --tag gcr.io/triggermesh/jtx
+	@cd javascript && gcloud builds submit --tag gcr.io/triggermesh/js
 # Apply the Koby manifests for the adapters.
 apply:
 	@cd jqtransformation/config && kubectl apply -f 100-registration.yaml

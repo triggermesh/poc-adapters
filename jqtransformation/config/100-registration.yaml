@@ -11,7 +11,7 @@ spec:
 
   workload:
     fromImage:
-      repo: gcr.io/ultra-hologram-297914/jqt:latest
+      repo: gcr.io/triggermesh/jqt:latest
     formFactor:
       knativeService:
         minScale: 1
