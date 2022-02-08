@@ -39,11 +39,14 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(env.ServerURL))
 	if err != nil {
+		logger.Fatal("error connecting to mongodb", err)
 		return nil
 	}
 
 	return &mongodbAdapter{
-		mclient: client,
+		mclient:           client,
+		defaultDatabase:   env.DefaultDatabase,
+		defaultCollection: env.DefaultCollection,
 
 		ceClient: ceClient,
 		logger:   logger,
@@ -53,7 +56,9 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 var _ pkgadapter.Adapter = (*mongodbAdapter)(nil)
 
 type mongodbAdapter struct {
-	mclient *mongo.Client
+	mclient           *mongo.Client
+	defaultDatabase   string
+	defaultCollection string
 
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
@@ -87,18 +92,53 @@ func (a *mongodbAdapter) dispatch(event cloudevents.Event) (*cloudevents.Event, 
 		}
 
 	default:
-		return a.reportError("event type not supported ", nil)
+		if err := a.insertFromConfig(event, ctx); err != nil {
+			return a.reportError("error invoking function: ", err)
+		}
+
 	}
 
 	return nil, cloudevents.ResultACK
 }
+
+func (a *mongodbAdapter) insertFromConfig(e cloudevents.Event, ctx context.Context) error {
+	a.logger.Infof("Inserting data..")
+	var payload map[string]interface{}
+	if err := e.DataAs(&payload); err != nil {
+		return err
+	}
+
+	collection := a.mclient.Database(a.defaultDatabase).Collection(a.defaultCollection)
+	res, err := collection.InsertOne(ctx, payload)
+	if err != nil {
+		return err
+	}
+
+	a.logger.Infof("Posted data id:")
+	a.logger.Info(res.InsertedID)
+
+	return nil
+}
+
 func (a *mongodbAdapter) kvQuery(e cloudevents.Event, ctx context.Context) (*cloudevents.Event, cloudevents.Result) {
 	qpd := &QueryPayload{}
 	if err := e.DataAs(qpd); err != nil {
 		return nil, err
 	}
 
-	collection := a.mclient.Database(qpd.Database).Collection(qpd.Collection)
+	var col string
+	var db string
+	col = a.defaultCollection
+	db = a.defaultDatabase
+	if qpd.Collection != "" {
+		col = qpd.Collection
+	}
+
+	if qpd.Database != "" {
+		db = qpd.Database
+	}
+
+	collection := a.mclient.Database(db).Collection(col)
 	filterCursor, err := collection.Find(ctx, bson.M{qpd.Key: qpd.Value})
 	if err != nil {
 		return a.reportError("error finding in collection: ", err)
@@ -131,7 +171,19 @@ func (a *mongodbAdapter) insert(e cloudevents.Event, ctx context.Context) error 
 		return err
 	}
 
-	collection := a.mclient.Database(ipd.Database).Collection(ipd.Collection)
+	var col string
+	var db string
+	col = a.defaultCollection
+	db = a.defaultDatabase
+	if ipd.Collection != "" {
+		col = ipd.Collection
+	}
+
+	if ipd.Database != "" {
+		db = ipd.Database
+	}
+
+	collection := a.mclient.Database(db).Collection(col)
 	if ipd.MapStrVal != nil {
 		res, err := collection.InsertOne(ctx, ipd.MapStrVal)
 		if err != nil {
@@ -152,7 +204,19 @@ func (a *mongodbAdapter) update(e cloudevents.Event, ctx context.Context) error 
 		return err
 	}
 
-	collection := a.mclient.Database(up.Database).Collection(up.Collection)
+	var col string
+	var db string
+	col = a.defaultCollection
+	db = a.defaultDatabase
+	if up.Collection != "" {
+		col = up.Collection
+	}
+
+	if up.Database != "" {
+		db = up.Database
+	}
+
+	collection := a.mclient.Database(db).Collection(col)
 	result, err := collection.UpdateOne(
 		ctx,
 		bson.M{up.SearchKey: up.SearchValue},
