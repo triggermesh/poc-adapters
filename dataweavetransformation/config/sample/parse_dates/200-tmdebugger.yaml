@@ -12,14 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: components.extensions.triggermesh.io/v1alpha1
-kind: JQTransformation
+apiVersion: serving.knative.dev/v1
+kind: Service
 metadata:
-  name: hello-jq
+  name: tmdebugger
 spec:
-  query: .foo | ..
-  sink:
-    ref:
-      apiVersion: serving.knative.dev/v1
-      kind: Service
-      name: tmdebugger
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: "1"
+        autoscaling.knative.dev/minScale: "1"
+    spec:
+      serviceAccountName: tmdebugger
+      containers:
+        - image: gcr.io/triggermesh/tmdebugger:latest
+          env:

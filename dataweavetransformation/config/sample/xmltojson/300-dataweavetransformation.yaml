@@ -13,11 +13,25 @@
 # limitations under the License.
 
 apiVersion: components.extensions.triggermesh.io/v1alpha1
-kind: JQTransformation
+kind: DataweaveTransformation
 metadata:
-  name: hello-jq
+  name: hello-dw
 spec:
-  query: .foo | ..
+  dw_spell: |-
+      %dw 2.0
+      output application/json
+      ---
+      {
+              address1: payload.order.buyer.address,
+              city: payload.order.buyer.city,
+              country: payload.order.buyer.nationality,
+              email: payload.order.buyer.email,
+              name: payload.order.buyer.name,
+              postalCode: payload.order.buyer.postCode,
+              stateOrProvince: payload.order.buyer.state
+      }
+  output_content_type: application/json
+  incoming_content_type: application/xml
   sink:
     ref:
       apiVersion: serving.knative.dev/v1

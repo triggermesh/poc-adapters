@@ -12,26 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: serving.knative.dev/v1
-kind: Service
+apiVersion: components.extensions.triggermesh.io/v1alpha1
+kind: DataweaveTransformation
 metadata:
-  name: event-display
+  name: hello-dw
 spec:
-  template:
-    spec:
-      containers:
-      - image: gcr.io/knative-releases/knative.dev/eventing/cmd/event_display
-
----
-
-kind: Trigger
-apiVersion: eventing.knative.dev/v1
-metadata:
-  name: event-display
-spec:
-  broker: demo
-  subscriber:
+  dw_spell: |-
+        %dw 2.0
+        output application/xml
+        fun normalize(date) = (date) replace "/" with "-" replace "." with "-"
+        ---
+        dates: (payload.dates mapObject {
+            normalized_as_string: normalize($)
+        })
+  output_content_type: application/xml
+  incoming_content_type: application/xml
+  sink:
     ref:
       apiVersion: serving.knative.dev/v1
       kind: Service
-      name: event-display
+      name: tmdebugger

@@ -15,9 +15,15 @@
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: event-display
+  name: tmdebugger
 spec:
   template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: "1"
+        autoscaling.knative.dev/minScale: "1"
     spec:
+      serviceAccountName: tmdebugger
       containers:
-      - image: gcr.io/knative-releases/knative.dev/eventing/cmd/event_display
+        - image: gcr.io/triggermesh/tmdebugger:latest
+          env:

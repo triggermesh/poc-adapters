@@ -12,9 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: eventing.knative.dev/v1
-kind: Broker
+apiVersion: sources.knative.dev/v1
+kind: PingSource
 metadata:
-  annotations:
-    eventing.knative.dev/broker.class: MTChannelBasedBroker
-  name: demo
+    name: cj
+spec:
+    data: |-
+      <dates>
+        <date>26-JUL-16</date>
+        <date>27/JUL/16</date>
+        <date>28.JUL.16</date>
+      </dates>
+    schedule: '*/1 * * * *'
+    contentType: application/xml
+    sink:
+      ref:
+        apiVersion: serving.knative.dev/v1
+        kind: Service
+        name: dataweavetransformations-hello-dw
