@@ -17,10 +17,18 @@ kind: PingSource
 metadata:
     name: cj
 spec:
-    data: '{"foo":"richard@triggermesh.com"}'
+    data: -|
+      NAME                STATE     TELEPHONE
+
+      John Smith          WA        418-Y11-4111
+
+      Mary Hartford       CA        319-Z19-4341
+
+      Evan Nolan          IL        219-532-c301'
     schedule: '*/1 * * * *'
+    contentType: application/text
     sink:
       ref:
         apiVersion: serving.knative.dev/v1
         kind: Service
-        name: jqtransformations-hello-jq
+        name: fixedwithtojsontransformations-fwtojson

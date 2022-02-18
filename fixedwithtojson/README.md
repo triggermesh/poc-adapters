@@ -1,7 +1,7 @@
 
 send this
 ```
-curl --location --request POST 'http://localhost:8080' \
+curl --location --request POST 'http://fixedwithtojsontransformations-fwtojson.default.tmkongdemo.triggermesh.io' \
 --header 'Ce-Specversion: 1.0' \
 --header 'Ce-Type: io.triggermesh.sample.event' \
 --header 'Ce-Id: 123123' \
