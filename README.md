@@ -51,3 +51,12 @@ Each one of the POC adapters, except MongoDB, has a sample deployment/flow that 
 kubectl apply -f <adapter>/config/sample/
 ```
 Each one of the samples runs on its own, with data coming from a PingSource object and ending up in an event-display sink. To verify the results, view the logs of the event-display pod.
+
+
+# Devlopment
+To create a new adapter, execute the following command:
+```
+./hack/scaffold.bash <adapter-name>
+```
+
+This will scafold out a new golang adapter project.
