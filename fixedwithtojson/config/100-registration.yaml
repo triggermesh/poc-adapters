@@ -1,0 +1,25 @@
+apiVersion: extensions.triggermesh.io/v1alpha1
+kind: KnativeSourceRegistration
+metadata:
+  name: fixedwithtojsontransformation
+spec:
+
+  generate:
+    names:
+      kind: FixedWithtoJSONTransformation
+      plural: fixedwithtojsontransformations
+
+  workload:
+    fromImage:
+      repo: gcr.io/triggermesh/fwtojson:latest
+    formFactor:
+      knativeService:
+        minScale: 1
+        maxScale: 10
+
+    parameterOptions:
+      arbitraryParameters: false
+      keyCasing: upper
+
+  configuration:
+    parameters:
