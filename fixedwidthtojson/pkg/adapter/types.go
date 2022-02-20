@@ -1,8 +1,8 @@
-package fixedwithtojson
+package fixedwidthtojson
 
 import pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 
-type FixedWithJSONRepresentation struct {
+type fixedwidthJSONRepresentation struct {
 	Fields []Field `json:"fields"`
 }
 

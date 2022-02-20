@@ -1,34 +1,24 @@
 # Copyright 2022 TriggerMesh Inc.
-#
+
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-#
+
 #     http://www.apache.org/licenses/LICENSE-2.0
-#
+
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: sources.knative.dev/v1
-kind: PingSource
+apiVersion: components.extensions.triggermesh.io/v1alpha1
+kind: fixedwidthtoJSONTransformation
 metadata:
-    name: cj
+  name: fwtojson
 spec:
-    data: -|
-      NAME                STATE     TELEPHONE
-
-      John Smith          WA        418-Y11-4111
-
-      Mary Hartford       CA        319-Z19-4341
-
-      Evan Nolan          IL        219-532-c301'
-    schedule: '*/1 * * * *'
-    contentType: application/text
-    sink:
-      ref:
-        apiVersion: serving.knative.dev/v1
-        kind: Service
-        name: fixedwithtojsontransformations-fwtojson
+  sink:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: tmdebugger

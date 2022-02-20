@@ -1,13 +1,13 @@
 apiVersion: extensions.triggermesh.io/v1alpha1
 kind: KnativeSourceRegistration
 metadata:
-  name: fixedwithtojsontransformation
+  name: fixedwidthtojsontransformation
 spec:
 
   generate:
     names:
-      kind: FixedWithtoJSONTransformation
-      plural: fixedwithtojsontransformations
+      kind: fixedwidthtoJSONTransformation
+      plural: fixedwidthtojsontransformations
 
   workload:
     fromImage:

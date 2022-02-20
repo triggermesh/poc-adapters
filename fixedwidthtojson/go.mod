@@ -1,4 +1,4 @@
-module github.com/triggermesh/poc-adapters/fixedwithtojson
+module github.com/triggermesh/poc-adapters/fixedwidthtojson
 
 go 1.17
 
@@ -14,6 +14,7 @@ require (
 replace k8s.io/client-go => k8s.io/client-go v0.21.4
 
 require (
+	github.com/stretchr/testify v1.7.0
 	github.com/triggermesh/triggermesh v1.13.0
 	go.uber.org/zap v1.20.0
 )
@@ -22,6 +23,7 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.7.1-0.20200907061046-05415f1de66d // indirect
 	contrib.go.opencensus.io/exporter/prometheus v0.4.0 // indirect
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2 // indirect
+	github.com/benbjohnson/clock v1.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blendle/zapdriver v1.3.1 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
@@ -51,6 +53,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/openzipkin/zipkin-go v0.3.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.11.0 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.32.1 // indirect

@@ -17,10 +17,10 @@ limitations under the License.
 package main
 
 import (
-	fixedwithtojson "github.com/triggermesh/poc-adapters/fixedwithtojson/pkg/adapter"
+	fixedwidthtojson "github.com/triggermesh/poc-adapters/fixedwidthtojson/pkg/adapter"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 
 func main() {
-	pkgadapter.Main("fixedwithtojson-adapter", fixedwithtojson.EnvAccessorCtor, fixedwithtojson.NewAdapter)
+	pkgadapter.Main("fixedwidthtojson-adapter", fixedwidthtojson.EnvAccessorCtor, fixedwidthtojson.NewAdapter)
 }

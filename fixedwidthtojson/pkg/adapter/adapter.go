@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package fixedwithtojson implements a CloudEvents adapter ...
-package fixedwithtojson
+// Package fixedwidthtojson implements a CloudEvents adapter ...
+package fixedwidthtojson
 
 import (
 	"context"
@@ -47,7 +47,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
 
-	return &adapter{
+	return &fwadapter{
 		sink:     env.Sink,
 		replier:  replier,
 		ceClient: ceClient,
@@ -55,9 +55,9 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	}
 }
 
-var _ pkgadapter.Adapter = (*adapter)(nil)
+var _ pkgadapter.Adapter = (*fwadapter)(nil)
 
-type adapter struct {
+type fwadapter struct {
 	sink     string
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
@@ -66,12 +66,12 @@ type adapter struct {
 
 // Start is a blocking function and will return if an error occurs
 // or the context is cancelled.
-func (a *adapter) Start(ctx context.Context) error {
-	a.logger.Info("Starting FixedWithToJSON Transformation Adapter")
+func (a *fwadapter) Start(ctx context.Context) error {
+	a.logger.Info("Starting fixedwidthToJSON Transformation Adapter")
 	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
-func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
+func (a *fwadapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	sd := string(event.Data())
 	ss := strings.Split(sd, "\n")
 	var spaceleft []int
@@ -96,7 +96,7 @@ func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 		}
 	}
 
-	fwj := &FixedWithJSONRepresentation{}
+	fwj := &fixedwidthJSONRepresentation{}
 	for i, f := range fields {
 		fv := []Field{}
 		fv = append(fv, Field{
