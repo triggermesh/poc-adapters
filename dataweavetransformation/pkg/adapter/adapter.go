@@ -143,7 +143,7 @@ func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 	event.SetType(event.Type() + ".response")
-	a.logger.Infof("responding with transformed event: %v", event)
+	a.logger.Infof("responding with transformed event: %v", event.Type())
 	if a.sink != "" {
 		if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
 			a.logger.Errorf("Error sending event to sink: %v", result)
