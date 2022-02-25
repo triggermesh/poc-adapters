@@ -6,6 +6,7 @@ image:
 	@cd jsontoxmltransformation && gcloud builds submit --tag gcr.io/triggermesh/jtx
 	@cd javascript && gcloud builds submit --tag gcr.io/triggermesh/js
 	@cd fixedwidthtojson && gcloud builds submit --tag gcr.io/triggermesh/fwtojson
+	@cd kafkasource && gcloud builds submit --tag gcr.io/triggermesh/kafkasource
 # Apply the Koby manifests for the adapters.
 apply:
 	@cd jqtransformation/config && kubectl apply -f 100-registration.yaml
@@ -14,6 +15,7 @@ apply:
 	@cd jsontoxmltransformation/config && kubectl apply -f 100-registration.yaml
 	@cd javascript/config && kubectl apply -f 100-registration.yaml
 	@cd fixedwidthtojson/config && kubectl apply -f 100-registration.yaml
+	@cd kafkasource/config && kubectl apply -f 100-registration.yaml
 # Delete the Koby manifests for the adapters.
 delete:
 	@cd jqtransformation/config && kubectl delete -f 100-registration.yaml
@@ -22,6 +24,7 @@ delete:
 	@cd jsontoxmltransformation/config && kubectl delete -f 100-registration.yaml
 	@cd javascript/config && kubectl delete -f 100-registration.yaml
 	@cd fixedwidthtojson/config && kubectl delete -f 100-registration.yaml
+	@cd kafkasource/config && kubectl delete -f 100-registration.yaml
 # Lint the adapters.
 lint:
 	@cd jqtransformation/pkg/adapter && golangci-lint run --deadline 2m
@@ -34,6 +37,8 @@ lint:
 	@cd jsontoxmltransformation/cmd && golangci-lint run  --deadline 2m
 	@cd fixedwidthtojson/pkg/adapter && golangci-lint run  --deadline 2m
 	@cd fixedwidthtojson/cmd && golangci-lint run  --deadline 2m
+	@cd kafkasource/pkg/adapter && golangci-lint run  --deadline 2m
+	@cd kafkasource/cmd && golangci-lint run  --deadline 2m
 # Build the adapters.
 build:
 	@cd jqtransformation/cmd && go build
@@ -41,6 +46,7 @@ build:
 	@cd dataweavetransformation/cmd && go build
 	@cd jsontoxmltransformation/cmd && go build
 	@cd fixedwidthtojson/cmd && go build
+	@cd kafkasource/cmd && go build
 # Clean build artifacts.
 clean:
 	@cd jqtransformation/cmd && go clean
@@ -48,6 +54,7 @@ clean:
 	@cd dataweavetransformation/cmd && go clean
 	@cd jsontoxmltransformation/cmd && go clean
 	@cd fixedwidthtojson/cmd && go clean
+	@cd kafkasource/cmd && go clean
 # Test the adapters.
 test:
 	@cd jqtransformation/pkg/adapter && go test
