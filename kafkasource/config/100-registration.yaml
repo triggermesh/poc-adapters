@@ -25,7 +25,6 @@ spec:
 
   workload:
     fromImage:
-      # this image is not built
       repo: gcr.io/triggermesh/kafkasource:latest
     formFactor:
       knativeService:
