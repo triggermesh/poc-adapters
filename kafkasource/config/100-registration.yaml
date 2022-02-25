@@ -38,7 +38,7 @@ spec:
   configuration:
     parameters:
     - name: confluent_bootstrap_servers
-      type: string
+      type: array
     - name: confluent_topics
       type: array
     - name: confluent_group_id

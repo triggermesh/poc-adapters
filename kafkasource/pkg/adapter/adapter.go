@@ -41,7 +41,7 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 
-	BootstrapServers    string   `envconfig:"CONFLUENT_BOOTSTRAP_SERVERS" required:"true"`
+	BootstrapServers    []string `envconfig:"CONFLUENT_BOOTSTRAP_SERVERS" required:"true"`
 	Topics              []string `envconfig:"CONFLUENT_TOPICS" required:"true"`
 	GroupID             string   `envconfig:"CONFLUENT_GROUP_ID" required:"true"`
 	SecurityMechanisms  string   `envconfig:"CONFLUENT_SECURITY_MECANISMS" required:"false" default:"GSSAPI"`

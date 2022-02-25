@@ -18,6 +18,7 @@ metadata:
   name: hello-kafka
 spec:
   confluent_bootstrap_servers:
+    - kafka-bootstrap-1.kafka.svc.cluster.local:9092
   confluent_topics:
     - hello-kafka
     - hello-kafka-2
