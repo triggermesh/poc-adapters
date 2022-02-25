@@ -121,7 +121,10 @@ func (a *kafkaAdapter) Start(ctx context.Context) error {
 			switch e := ev.(type) {
 			case *kafka.Message:
 				a.logger.Infof("Received message on topic %s", e.TopicPartition.Topic)
-				a.emitEvent(ctx, string(e.Value), e.TopicPartition)
+				err := a.emitEvent(ctx, string(e.Value), e.TopicPartition)
+				if err != nil {
+					a.logger.Errorf("Failed to emit event: %v", err)
+				}
 			case kafka.Error:
 				a.logger.Error("Error: %v: %v", e.Code(), e)
 				if e.Code() == kafka.ErrAllBrokersDown {
