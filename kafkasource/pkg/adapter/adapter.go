@@ -142,7 +142,7 @@ func (a *kafkaAdapter) Start(ctx context.Context) error {
 
 func (a *kafkaAdapter) emitEvent(ctx context.Context, message string, topicPartition kafka.TopicPartition) error {
 	event := cloudevents.NewEvent(cloudevents.VersionV1)
-	event.SetType("io.triggermesh.kafka.target.event")
+	event.SetType("io.triggermesh.kafka.event")
 	event.SetSubject("/kafka/target/event")
 	event.SetSource(*topicPartition.Topic)
 	event.SetID(topicPartition.Offset.String())
