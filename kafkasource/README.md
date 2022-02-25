@@ -1,6 +1,5 @@
 # KafkaSource
-the KafkaSource exposes a service that allows the user to transform a JSON payload
-by using a [JQ](https://devdocs.io/jq/) expression.
+A Knative Source that reads from a list of Kafka topics.
 
 ## Deploying with Koby
 
