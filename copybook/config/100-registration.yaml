@@ -37,3 +37,5 @@ spec:
 
   configuration:
     parameters:
+    - name: copybook
+      type: string

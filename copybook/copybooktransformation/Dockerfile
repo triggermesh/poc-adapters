@@ -3,7 +3,6 @@ FROM python:buster
 RUN apt-get update
 
 COPY requirements.txt /
-COPY ASCII_BOOK.cob /
 RUN pip install -r requirements.txt
 
 COPY copybooktransformation.py /

@@ -13,6 +13,12 @@ app = Flask(__name__)
 
 bookfname='ASCII_BOOK.cob'
 
+cb = os.environ.get('COPYBOOK')
+
+text_file = open("ASCII_BOOK.cob", "x")
+n = text_file.write(cb)
+text_file.close()
+
 dict_structure = CopybookExtractor(bookfname).dict_book_structure
 
 parser = Parser(dict_structure, ParseType.FLAT_ASCII).build()
