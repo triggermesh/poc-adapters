@@ -30,7 +30,7 @@ print("// " + "-" * 70)
 # create an endpoint at http://localhost:/8080/
 @app.route("/", methods=["POST"])
 def home():
-    # event = from_http(request.headers, request.get_data())
+    event = from_http(request.headers, request.get_data())
     message = json.loads(request.data.decode('utf-8'))
     x = message['data']
 
@@ -39,17 +39,16 @@ def home():
     # print(simplejson.dumps(dictvalue))
 
     attributes = {
-        "type": "com.example.sampletype1",
+        "type": event['type'] + ".response",
         "source": "https://example.com/event-producer",
+        "content-type": "application/json",
     }
 
     data = simplejson.dumps(dictvalue)
     revent = CloudEvent(attributes, data)
-    headers, body = to_binary(revent)
-    sink = os.environ.get('K_SINK')
-    print(headers['ce-type'])
-    headers['ce-type'] = headers['ce-type'] + ".response"
+    headers, body = to_structured(revent)
 
+    sink = os.environ.get('K_SINK')
     requests.post(sink, data=body, headers=headers)
     return "", 200
 
