@@ -6,6 +6,7 @@ image:
 	@cd jsontoxmltransformation && gcloud builds submit --tag gcr.io/triggermesh/jtx
 	@cd javascript && gcloud builds submit --tag gcr.io/triggermesh/js
 	@cd fixedwidthtojson && gcloud builds submit --tag gcr.io/triggermesh/fwtojson
+	@cd copybook/copybooktransformation && gcloud builds submit --tag gcr.io/triggermesh/copybooktransformation
 # Apply the Koby manifests for the adapters.
 apply:
 	@cd jqtransformation/config && kubectl apply -f 100-registration.yaml

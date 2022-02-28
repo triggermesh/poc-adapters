@@ -1,9 +1,10 @@
 from flask import Flask, request
-from cloudevents.http import CloudEvent, to_binary, from_http
+from cloudevents.http import CloudEvent, to_binary, from_http, to_structured
 
 
 import simplejson
 import requests
+import json
 import os
 from coboljsonifier.copybookextractor import CopybookExtractor
 from coboljsonifier.parser import Parser
@@ -29,10 +30,13 @@ print("// " + "-" * 70)
 # create an endpoint at http://localhost:/8080/
 @app.route("/", methods=["POST"])
 def home():
-    event = from_http(request.headers, request.get_data())
-    parser.parse(event.data.decode("utf-8"))
+    # event = from_http(request.headers, request.get_data())
+    message = json.loads(request.data.decode('utf-8'))
+    x = message['data']
+
+    parser.parse(x['data'])
     dictvalue = parser.value
-    print(simplejson.dumps(dictvalue))
+    # print(simplejson.dumps(dictvalue))
 
     attributes = {
         "type": "com.example.sampletype1",
@@ -43,6 +47,9 @@ def home():
     revent = CloudEvent(attributes, data)
     headers, body = to_binary(revent)
     sink = os.environ.get('K_SINK')
+    print(headers['ce-type'])
+    headers['ce-type'] = headers['ce-type'] + ".response"
+
     requests.post(sink, data=body, headers=headers)
     return "", 200
 
