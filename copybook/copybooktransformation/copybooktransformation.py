@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, make_response
 from cloudevents.http import CloudEvent, to_binary, from_http, to_structured
 
 
@@ -32,7 +32,7 @@ print("// " + "-" * 70)
 def home():
     event = from_http(request.headers, request.get_data())
     message = json.loads(request.data.decode('utf-8'))
-    x = message['data']
+    x = message
 
     parser.parse(x)
     dictvalue = parser.value
@@ -49,8 +49,11 @@ def home():
     headers, body = to_structured(revent)
 
     sink = os.environ.get('K_SINK')
-    requests.post(sink, data=body, headers=headers)
-    return "", 200
+    if sink != "" :
+        requests.post(sink, data=body.decode('utf-8'), headers=headers)
+        return "", 200
+
+    return data,200
 
 if __name__ == "__main__":
     app.run(port=8080)
