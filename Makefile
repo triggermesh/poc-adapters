@@ -37,8 +37,8 @@ lint:
 	@cd jsontoxmltransformation/cmd && golangci-lint run  --deadline 2m
 	@cd fixedwidthtojson/pkg/adapter && golangci-lint run  --deadline 2m
 	@cd fixedwidthtojson/cmd && golangci-lint run  --deadline 2m
-	@cd javascript/pkg/adapter && golangci-lint run  --deadline 2m
-	@cd javascript/cmd && golangci-lint run  --deadline 2m
+	@cd techuluspushtarget/pkg/adapter && golangci-lint run  --deadline 2m
+	@cd techuluspushtarget/cmd && golangci-lint run  --deadline 2m
 # Build the adapters.
 build:
 	@cd jqtransformation/cmd && go build
