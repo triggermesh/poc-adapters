@@ -125,8 +125,8 @@ func (a *pushAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*c
 	fmt.Println(string(body))
 
 	event.SetType(event.Type() + ".response")
-	err = event.SetData("application/json", body)
-	if err != nil {
+	err2 := event.SetData("application/json", body)
+	if err2 != nil {
 		a.logger.Errorw("Failed to set event data", zap.Error(err))
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "Error setting event data")
 	}
