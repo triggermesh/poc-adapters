@@ -32,28 +32,23 @@ print("// " + "-" * 70)
 def home():
     event = from_http(request.headers, request.get_data())
     message = json.loads(request.data.decode('utf-8'))
-    x = message
-
-    parser.parse(x)
+    parser.parse(message)
     dictvalue = parser.value
-    # print(simplejson.dumps(dictvalue))
-
     attributes = {
         "type": event['type'] + ".response",
         "source": "https://example.com/event-producer",
-        # "content-type": "application/json",
     }
 
     data = simplejson.dumps(dictvalue)
     revent = CloudEvent(attributes, data)
-    headers, body = to_structured(revent)
-
+    headers, body = to_binary(revent)
     sink = os.environ.get('K_SINK')
+
     if sink != "" :
-        requests.post(sink, data=body.decode('utf-8'), headers=headers)
+        requests.post(sink, data=data, headers=headers)
         return "", 200
 
-    return data,200
+    return (data, 200)
 
 if __name__ == "__main__":
     app.run(port=8080)
