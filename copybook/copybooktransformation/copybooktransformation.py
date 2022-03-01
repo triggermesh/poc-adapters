@@ -34,14 +34,14 @@ def home():
     message = json.loads(request.data.decode('utf-8'))
     x = message['data']
 
-    parser.parse(x['data'])
+    parser.parse(x)
     dictvalue = parser.value
     # print(simplejson.dumps(dictvalue))
 
     attributes = {
         "type": event['type'] + ".response",
         "source": "https://example.com/event-producer",
-        "content-type": "application/json",
+        # "content-type": "application/json",
     }
 
     data = simplejson.dumps(dictvalue)
