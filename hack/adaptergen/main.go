@@ -60,6 +60,10 @@ func main() {
 	adpaterdir := filepath.Join(*cfgDir, temp.LowercaseKind, "pkg", "adapter")
 	mustMkdirAll(adpaterdir)
 
+	// make config directory
+	configdir := filepath.Join(*cfgDir, temp.LowercaseKind, configPath)
+	mustMkdirAll(configdir)
+
 	// populate cmd directory
 	// read main.go and replace the template variables
 	if err := temp.replaceTemplates(
@@ -76,6 +80,30 @@ func main() {
 		filepath.Join(*cfgDir, temp.LowercaseKind, adapterPath, "/adapter.go"),
 	); err != nil {
 		log.Fatalf("failed creating the adapter templates: %v", err)
+	}
+
+	// populate config directory
+	// read config.yam
+	if err := temp.replaceTemplates(
+		filepath.Join(templatesPath, configPath, "100-registration.yaml"),
+		filepath.Join(*cfgDir, temp.LowercaseKind, configPath, "100-registration.yaml"),
+	); err != nil {
+		log.Fatalf("failed creating the config templates: %v", err)
+	}
+
+	if err := temp.replaceTemplates(
+		filepath.Join(templatesPath, configPath, "101-instance.yaml"),
+		filepath.Join(*cfgDir, temp.LowercaseKind, configPath, "101-instance.yaml"),
+	); err != nil {
+		log.Fatalf("failed creating the config templates: %v", err)
+	}
+
+	// dockerfile
+	if err := temp.replaceTemplates(
+		filepath.Join(templatesPath, "Dockerfile"),
+		filepath.Join(*cfgDir, temp.LowercaseKind, "Dockerfile"),
+	); err != nil {
+		log.Fatalf("failed creating the Dockerfile: %v", err)
 	}
 
 	fmt.Println("done")
