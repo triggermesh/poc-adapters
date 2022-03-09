@@ -18,8 +18,8 @@ metadata:
   name: hello-path
 spec:
   path_a_continue_if: (event.fromEmail == "richard@triggermesh.com")
-  path_a_continue_type: http://tmdebugger.default.tmkongdemo.triggermesh.io
-  path_a_continue_path: io.triggermesh.paths.ContinuePath.a
+  path_a_continue_type: io.triggermesh.paths.ContinuePath.a
+  path_a_continue_path: http://tmdebugger.default.tmkongdemo.triggermesh.io
   path_b_continue_if: (event.fromEmail == "bob@triggermesh.com")
   path_b_continue_type: io.triggermesh.paths.ContinuePath.b
   path_b_continue_path: http://tmdebugger.default.tmkongdemo.triggermesh.io

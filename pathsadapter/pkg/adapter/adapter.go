@@ -14,7 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package PATHSADAPTER implements a CloudEvents adapter that...
+// Package PATHSADAPTER implements a CloudEvents adapter that accepts javascript if expressions
+// along with a new type and path to route the event to if the expression evaluates to true.
 package pathsadapter
 
 import (
@@ -37,15 +38,23 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 }
 
 type envAccessor struct {
-	PathAContinueIf   string `envconfig:"PATH_A_CONTINUE_IF"`
+	// PathAContinueIf is a javascript if expression to evaluate to determine if event should continue to path A
+	PathAContinueIf string `envconfig:"PATH_A_CONTINUE_IF"`
+	// PathAContinuePath is a path to route event to if path A should continue
 	PathAContinuePath string `envconfig:"PATH_A_CONTINUE_PATH"`
+	// PathAContinueType is the event type to change the outgoing event type to if path A should continue
 	PathAContinueType string `envconfig:"PATH_A_CONTINUE_TYPE"`
 
-	PathBContinueIf   string `envconfig:"PATH_B_CONTINUE_IF"`
+	// PathBContinueIf is a javascript if expression to evaluate to determine if event should continue to path B
+	PathBContinueIf string `envconfig:"PATH_B_CONTINUE_IF"`
+	// PathBContinuePath is a path to route event to if path B should continue
 	PathBContinuePath string `envconfig:"PATH_B_CONTINUE_PATH"`
+	// PathBContinueType is the event type to change the outgoing event type to if path B should continue
 	PathBContinueType string `envconfig:"PATH_B_CONTINUE_TYPE"`
 
+	// DefaultContinuePath is a path to route event to if no other paths should continue
 	DefaultContinuePath string `envconfig:"DEFAULT_CONTINUE_PATH"`
+	// DefaultContinueType is the event type to change the outgoing event type to if no other paths should continue
 	DefaultContinueType string `envconfig:"DEFAULT_CONTINUE_TYPE"`
 
 	pkgadapter.EnvConfig
