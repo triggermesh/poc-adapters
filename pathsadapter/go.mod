@@ -14,7 +14,6 @@ require (
 replace k8s.io/client-go => k8s.io/client-go v0.21.4
 
 require (
-	github.com/clbanning/mxj v1.8.4
 	github.com/robertkrimen/otto v0.0.0-20211019175142-5b0d97091c6f
 	github.com/triggermesh/triggermesh v1.13.0
 	go.uber.org/zap v1.20.0

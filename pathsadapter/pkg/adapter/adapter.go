@@ -69,16 +69,16 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	}
 
 	return &pathsadapteradapter{
-		pathAContinueIf:   `(event.fromEmail == "jeff@triggermesh.com")`,
-		pathAContinueType: `io.triggermesh.paths.a`,
-		pathAContinuePath: "http://tmdebugger.default.tmkongdemo.triggermesh.io",
+		pathAContinueIf:   env.pathAContinueIf,
+		pathAContinueType: env.pathAContinueType,
+		pathAContinuePath: env.pathAContinuePath,
 
-		pathBContinueIf:   `(event.fromEmail == "bob@triggermesh.com")`,
-		pathBContinueType: `io.triggermesh.paths.b`,
-		pathBContinuePath: "http://tmdebugger.default.tmkongdemo.triggermesh.io",
+		pathBContinueIf:   env.pathBContinueIf,
+		pathBContinueType: env.pathBContinueType,
+		pathBContinuePath: env.pathBContinuePath,
 
-		defaultContinuePath: `http://tmdebugger.default.tmkongdemo.triggermesh.io`,
-		defaultContinueType: `io.triggermesh.paths.ContinuePath.default`,
+		defaultContinuePath: env.defaultContinuePath,
+		defaultContinueType: env.defaultContinueType,
 
 		replier:  replier,
 		ceClient: ceClient,
@@ -130,7 +130,6 @@ func (a *pathsadapteradapter) dispatch(ctx context.Context, event cloudevents.Ev
 	if err != nil {
 		a.logger.Errorf("Error running script: %v", err)
 	}
-	// fmt.Println(val.String())
 
 	value, err := vm.Get("response")
 	if err != nil {

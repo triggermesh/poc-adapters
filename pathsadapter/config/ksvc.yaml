@@ -1,0 +1,26 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: paths
+spec:
+  template:
+    spec:
+      containers:
+        - image: gcr.io/triggermesh/paths:latest
+          env:
+            - name: PATH_A_CONTINUE_IF
+              value: (event.fromEmail != "richard@triggermesh.com")
+            - name: PATH_A_CONTINUE_PATH
+              value: http://tmdebugger.default.tmkongdemo.triggermesh.io
+            - name: PATH_A_CONTINUE_TYPE
+              value: io.triggermesh.paths.ContinuePath.a
+            - name: PATH_B_CONTINUE_IF
+              value: (event.fromEmail == "bob@triggermesh.com")
+            - name: PATH_B_CONTINUE_PATH
+              value: http://tmdebugger.default.tmkongdemo.triggermesh.io
+            - name: PATH_B_CONTINUE_TYPE
+              value: io.triggermesh.paths.ContinuePath.b
+            - name: DEFAULT_CONTINUE_PATH
+              value: http://tmdebugger.default.tmkongdemo.triggermesh.io
+            - name: DEFAULT_CONTINUE_TYPE
+              value: io.triggermesh.paths.ContinuePath.default
