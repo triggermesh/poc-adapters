@@ -37,16 +37,16 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 }
 
 type envAccessor struct {
-	pathAContinueIf   string `envconfig:"PATH_A_CONTINUE_IF"`
-	pathAContinuePath string `envconfig:"PATH_A_CONTINUE_PATH"`
-	pathAContinueType string `envconfig:"PATH_A_CONTINUE_TYPE"`
+	PathAContinueIf   string `envconfig:"PATH_A_CONTINUE_IF"`
+	PathAContinuePath string `envconfig:"PATH_A_CONTINUE_PATH"`
+	PathAContinueType string `envconfig:"PATH_A_CONTINUE_TYPE"`
 
-	pathBContinueIf   string `envconfig:"PATH_B_CONTINUE_IF"`
-	pathBContinuePath string `envconfig:"PATH_B_CONTINUE_PATH"`
-	pathBContinueType string `envconfig:"PATH_B_CONTINUE_TYPE"`
+	PathBContinueIf   string `envconfig:"PATH_B_CONTINUE_IF"`
+	PathBContinuePath string `envconfig:"PATH_B_CONTINUE_PATH"`
+	PathBContinueType string `envconfig:"PATH_B_CONTINUE_TYPE"`
 
-	defaultContinuePath string `envconfig:"DEFAULT_CONTINUE_PATH"`
-	defaultContinueType string `envconfig:"DEFAULT_CONTINUE_TYPE"`
+	DefaultContinuePath string `envconfig:"DEFAULT_CONTINUE_PATH"`
+	DefaultContinueType string `envconfig:"DEFAULT_CONTINUE_TYPE"`
 
 	pkgadapter.EnvConfig
 	// BridgeIdentifier is the name of the bridge workflow this target is part of
@@ -69,16 +69,16 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	}
 
 	return &pathsadapteradapter{
-		pathAContinueIf:   env.pathAContinueIf,
-		pathAContinueType: env.pathAContinueType,
-		pathAContinuePath: env.pathAContinuePath,
+		pathAContinueIf:   env.PathAContinueIf,
+		pathAContinueType: env.PathAContinueType,
+		pathAContinuePath: env.PathAContinuePath,
 
-		pathBContinueIf:   env.pathBContinueIf,
-		pathBContinueType: env.pathBContinueType,
-		pathBContinuePath: env.pathBContinuePath,
+		pathBContinueIf:   env.PathBContinueIf,
+		pathBContinueType: env.PathBContinueType,
+		pathBContinuePath: env.PathBContinuePath,
 
-		defaultContinuePath: env.defaultContinuePath,
-		defaultContinueType: env.defaultContinueType,
+		defaultContinuePath: env.DefaultContinuePath,
+		defaultContinueType: env.DefaultContinueType,
 
 		replier:  replier,
 		ceClient: ceClient,
@@ -109,7 +109,7 @@ type pathsadapteradapter struct {
 // Start is a blocking function and will return if an error occurs
 // or the context is cancelled.
 func (a *pathsadapteradapter) Start(ctx context.Context) error {
-	a.logger.Info("Starting PATHSADAPTER Adapter")
+	a.logger.Info("Starting Path Adapter")
 
 	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
