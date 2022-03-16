@@ -1,3 +1,4 @@
+"use strict";
 /*
 Copyright 2022 TriggerMesh Inc.
 
@@ -13,14 +14,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
-package main
-
-import (
-	azuresentineltarget "github.com/triggermesh/poc-adapters/azuresentineltarget/pkg/adapter"
-	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
-)
-
-func main() {
-	pkgadapter.Main("azuresentineltarget-adapter", azuresentineltarget.EnvAccessorCtor, azuresentineltarget.NewAdapter)
-}
+exports.__esModule = true;
+var express = require('express');
+var app = express();
+var port = 8080;
+var HTTP = require("cloudevents").HTTP;
+app.post("/", function (req, res) {
+    var receivedEvent = HTTP.toEvent({ headers: req.headers, body: req.body });
+    console.log(receivedEvent);
+    res.sendStatus(200);
+});
+app.listen(port, function () {
+    console.log("Example app listening on port ".concat(port));
+});

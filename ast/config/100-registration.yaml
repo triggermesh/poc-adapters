@@ -1,0 +1,27 @@
+apiVersion: extensions.triggermesh.io/v1alpha1
+kind: GenericRegistration
+metadata:
+  name: azuresentineltarget
+spec:
+
+  generate:
+    names:
+      kind: AzureSentinelTarget
+      plural: azuresentineltargets
+
+  workload:
+    fromImage:
+      repo: gcr.io/triggermesh/azuresentineltarget:latest
+    formFactor:
+      knativeService:
+        minScale: 1
+        maxScale: 10
+
+    parameterOptions:
+      arbitraryParameters: false
+      keyCasing: upper
+
+  configuration:
+    parameters:
+    - name: mongodb_server_url
+      type: string
