@@ -1,9 +1,3 @@
-export AZURE_CLIENT_SECRET=Fll7Q~fQ4uu_EkmvYAorlEO196CDJ6osTlC1C
-export AZURE_TENANT_ID=f14eddee-e73b-481d-8237-17983764afcb
-export AZURE_CLIENT_ID=6fbbd6c1-a890-49ca-af2a-142bade07e7a
-export AZURE_SENTINEL_SUBSCRIPTION_ID=77641a71-ffc3-4cfd-abd9-6ff8dc509a3d
-export AZURE_SENTINEL_RESOURCE_GROUP=sent
-export AZURE_SENTINEL_WORKSPACE=sent
 
 curl -v "localhost:8080" \
        -X POST \
