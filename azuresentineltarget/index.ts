@@ -4,17 +4,17 @@ import * as log4js from 'log4js';
 const logger = log4js.getLogger('azure-sentinel-dispatcher');
 logger.level = process.env.LOG_LEVEL || 'info';
 const express = require("express");
-const { CloudEvent, HTTP } = require("cloudevents");
+const { HTTP } = require("cloudevents");
 const app = express();
 const msal = require('@azure/msal-node');
 
 
-const AZURE_SUBSCRIPTION_ID = "77641a71-ffc3-4cfd-abd9-6ff8dc509a3d"
-const AZURE_RESOURCE_GROUP = "sent"
-const AZURE_WORKSPACE = "sent"
-const AZURE_CLIENT_SECRET = "Fll7Q~fQ4uu_EkmvYAorlEO196CDJ6osTlC1C"
-const AZURE_CLIENT_ID = "90f08ae5-11ce-46fb-a424-b54ffd3a25f7"
-const AZURE_TENANT_ID = "f14eddee-e73b-481d-8237-17983764afcb"
+const AZURE_SUBSCRIPTION_ID =  process.env.AZURE_SUBSCRIPTION_ID;
+const AZURE_RESOURCE_GROUP =  process.env.AZURE_RESOURCE_GROUP;
+const AZURE_WORKSPACE =  process.env.AZURE_WORKSPACE;
+const AZURE_CLIENT_SECRET =  process.env.AZURE_CLIENT_SECRET;
+const AZURE_CLIENT_ID =  process.env.AZURE_CLIENT_ID;
+const AZURE_TENANT_ID =  process.env.AZURE_TENANT_ID;
 
 
 const AZURE_API_VERSION = '2020-01-01';
