@@ -6,6 +6,8 @@ image:
 	@cd jsontoxmltransformation && gcloud builds submit --tag gcr.io/triggermesh/jtx
 	@cd javascript && gcloud builds submit --tag gcr.io/triggermesh/js
 	@cd fixedwidthtojson && gcloud builds submit --tag gcr.io/triggermesh/fwtojson
+
+	@cd copybook/copybooktransformation && gcloud builds submit --tag gcr.io/triggermesh/copybooktransformation
 	@cd techuluspushtarget && gcloud builds submit --tag gcr.io/triggermesh/techuluspushtarget
 	@cd pathsadapter && gcloud builds submit --tag gcr.io/triggermesh/paths
 # Apply the Koby manifests for the adapters.
