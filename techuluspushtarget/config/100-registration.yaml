@@ -1,0 +1,27 @@
+apiVersion: extensions.triggermesh.io/v1alpha1
+kind: GenericRegistration
+metadata:
+  name: techuluspushtarget
+spec:
+
+  generate:
+    names:
+      kind: TechulusPushTarget
+      plural: techuluspushtargets
+
+  workload:
+    fromImage:
+      repo: gcr.io/triggermesh/techuluspushtarget:latest
+    formFactor:
+      knativeService:
+        minScale: 1
+        maxScale: 10
+
+    parameterOptions:
+      arbitraryParameters: false
+      keyCasing: upper
+
+  configuration:
+    parameters:
+    - name: api_key
+      type: string

@@ -1,0 +1,41 @@
+apiVersion: extensions.triggermesh.io/v1alpha1
+kind: GenericRegistration
+metadata:
+  name: path
+spec:
+
+  generate:
+    names:
+      kind: Path
+      plural: paths
+
+  workload:
+    fromImage:
+      repo: gcr.io/triggermesh/paths:latest
+    formFactor:
+      knativeService:
+        minScale: 1
+        maxScale: 10
+
+    parameterOptions:
+      arbitraryParameters: false
+      keyCasing: upper
+
+  configuration:
+    parameters:
+    - name: path_a_continue_if
+      type: string
+    - name: path_a_continue_type
+      type: string
+    - name: path_a_continue_path
+      type: string
+    - name: path_b_continue_if
+      type: string
+    - name: path_b_continue_type
+      type: string
+    - name: path_b_continue_path
+      type: string
+    - name: default_continue_path
+      type: string
+    - name: default_continue_type
+      type: string

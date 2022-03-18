@@ -56,7 +56,8 @@ Each one of the samples runs on its own, with data coming from a PingSource obje
 # Devlopment
 To create a new adapter, execute the following command:
 ```
-./hack/scaffold.bash <adapter-name>
+cd hack
+go run . --kind <adapter>
 ```
 
 This will scafold out a new golang adapter project.
