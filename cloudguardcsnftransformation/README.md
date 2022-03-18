@@ -3,49 +3,51 @@ python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 export K_SINK=http://localhost:8081
-export COPYBOOK='
-      *================================================================*00010000
-      *                 COBOL COPYBOOK EXAMPLE - ASCII                 *00020000
-      * -------------------------------------------------------------- *00021000
-      * NOTE: This copybook handle ascii text content that in general  *00022000
-      *       is written in EBCDIC codepage in Mainframes and is       *00023000
-      *       converted in transfer methods to ASCII. To convert it,   *00024000
-      *       the content needs to be in plain EBCDIC text such as     *00025000
-      *       PIC X(n), PIC A(n), PIC +99999.99, PIC +ZZZZZ9.99.       *00026000
-      *       In FTP transfer use TEXT.                                *00027000
-      *                                Joao Roberto Perin - 2021-09-15 *00028000
-      *================================================================*00030000
-      *                                           REGISTRY LENGHT: 100 *00040000
-      *================================================================*00050000
-       01 :DATA1:-DETAIL-REGISTRY.                                      00060000
-          03 :DATA1:-REGISTRY-TYPE             PIC 9(002).              00070000
-             88 :DATA1:-REGISTRY-TYPE-HEADER     VALUE 01.              00080000
-             88 :DATA1:-REGISTRY-TYPE-DETAIL     VALUE 02.              00090000
-             88 :DATA1:-REGISTRY-TYPE-TRAILLER   VALUE 99.              00100000
-          03 :DATA1:-COMPANY                   PIC 9(003).              00110000
-          03 :DATA1:-USER-ACCOUNT              PIC X(019).              00120000
-          03 :DATA1:-BIRTH-DATE                PIC X(010).              00130000
-COMM  *      BIRTH-DATE: YYYY-MM-DD                                     00140000
-          03 :DATA1:-NAME                      PIC X(040).              00150000
-          03 :DATA1:-CREDIT-LIMIT              PIC +9999999.            00160000
-          03 :DATA1:-LIMIT-USED                PIC +99999.99.           00170000
-          03 :DATA1:-STATUS OCCURS 4 TIMES.                             00180000
-             05 :DATA1:-STATUS-FLAG            PIC X(001).              00190000
-RESERV    03 FILLER                            PIC X(003).              00200000
-      *================================================================*00210000
-      *                               END                              *00220000
-      *================================================================*00230000'
 ```
 
 
-
 ```
-curl -v "http://copybooktransformations-cb.default.tmkongdemo.triggermesh.io" \
+curl -v "http://localhost:8080" \
        -X POST \
        -H "Ce-Id: 536808d3-88be-4077-9d7a-a3f162705f79" \
        -H "Ce-Specversion: 1.0" \
        -H "Ce-Type: io.triggermesh.sendgrid.email.send" \
        -H "Ce-Source: dev.knative.samples/helloworldsource" \
        -H "Content-Type: application/json" \
-       -d '"0200400400000000900011111971-01-21JOHN ROBERT PERIN                       +0001001-00100.101234  \n"'
+       -d '{
+    "eventType" : "com.oraclecloud.cloudguard.problemdetected",
+    "cloudEventsVersion" : "0.1",
+    "eventTypeVersion" : "2.0",
+    "source" : "CloudGuardResponderEngine",
+    "eventTime" : "2021-08-28T16:37:59Z",
+    "contentType" : "application/json",
+    "data" : {
+      "compartmentId" : "ocid1.compartment.oc1..aaaaaaaaeqm7cycpkedmlqzmitgjy5ya5urtae6zoogb7epspwrqz2kxxwta",
+      "compartmentName" : "McMillan",
+      "resourceName" : "Bucket is public",
+      "resourceId" : "ocid1.cloudguardproblem.oc1.iad.amaaaaaa24o7ld2qphw36wghvk44yms2u3hm4wnzhvtgcakktusurhtepevq",
+      "additionalDetails" : {
+        "tenantId" : "ocid1.tenancy.oc1..aaaaaaaagfqbe4ujb2dgwxtp37gzinrxt6h6hfshjokfgfi5nzquxmfpzkyq",
+        "status" : "OPEN",
+        "reason" : "New Problem detected by CloudGuard",
+        "problemName" : "BUCKET_IS_PUBLIC",
+        "riskLevel" : "CRITICAL",
+        "problemType" : "CONFIG_CHANGE",
+        "resourceName" : "AutoVinci",
+        "resourceId" : "orasenatdpltsecitom01/AutoVinci",
+        "resourceType" : "Bucket",
+        "targetId" : "ocid1.cloudguardtarget.oc1.iad.amaaaaaa24o7ldyaborosittsemtunkb2kkn54bysbznwa4xdu7rj3mpulza",
+        "labels" : "CIS_OCI_V1.1_OBJECTSTORAGE, ObjectStorage",
+        "firstDetected" : "2021-08-28T16:37:36.945Z",
+        "lastDetected" : "2021-08-28T16:37:36.945Z",
+        "region" : "us-phoenix-1",
+        "problemDescription" : "Object Storage supports anonymous, unauthenticated access to a bucket. A public bucket that has read access enabled for anonymous users allows anyone to obtain object metadata, download bucket objects, and optionally list bucket contents.",
+        "problemRecommendation" : "Ensure that the bucket is sanctioned for public access, and if not, direct the OCI administrator to restrict the bucket policy to allow only specific users access to the resources required to accomplish their job functions."
+      }
+    },
+    "eventID" : "1642b454-725e-412f-bfc9-783803f83134",
+    "extensions" : {
+      "compartmentId" : "ocid1.compartment.oc1..aaaaaaaaeqm7cycpkedmlqzmitgjy5ya5urtae6zoogb7epspwrqz2kxxwta"
+    }
+   }'
 ```

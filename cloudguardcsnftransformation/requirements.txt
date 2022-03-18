@@ -2,7 +2,6 @@ certifi==2021.10.8
 charset-normalizer==2.0.12
 click==8.0.4
 cloudevents==1.2.0
-coboljsonifier==1.0.3
 coverage==5.5
 deprecation==2.1.0
 ebcdic==1.1.1
