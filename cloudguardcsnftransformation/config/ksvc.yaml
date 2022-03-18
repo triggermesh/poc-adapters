@@ -12,30 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: extensions.triggermesh.io/v1alpha1
-kind: KnativeSourceRegistration
+apiVersion: serving.knative.dev/v1
+kind: Service
 metadata:
-  name: copybooktransformation
+  name: gcloudgard-transformation
 spec:
+  template:
+    spec:
+      containers:
+        - image: gcr.io/triggermesh/cgcsnf:latest
+          env:
+          - name: K_SINK
+            value: http://tmdebugger-default.marlinspike.io
 
-  generate:
-    names:
-      kind: CopyBookTransformation
-      plural: copybooktransformations
-
-  workload:
-    fromImage:
-      repo: gcr.io/triggermesh/copybooktransformation:latest
-    formFactor:
-      knativeService:
-        minScale: 1
-        maxScale: 10
-
-    parameterOptions:
-      arbitraryParameters: false
-      keyCasing: upper
-
-  configuration:
-    parameters:
-    - name: copybook
-      type: string
+---

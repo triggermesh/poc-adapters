@@ -7,7 +7,7 @@ export K_SINK=http://localhost:8081
 
 
 ```
-curl -v "http://localhost:8080" \
+curl -v "http://gcloudgard-transformation-default.marlinspike.io" \
        -X POST \
        -H "Ce-Id: 536808d3-88be-4077-9d7a-a3f162705f79" \
        -H "Ce-Specversion: 1.0" \
@@ -50,4 +50,10 @@ curl -v "http://localhost:8080" \
       "compartmentId" : "ocid1.compartment.oc1..aaaaaaaaeqm7cycpkedmlqzmitgjy5ya5urtae6zoogb7epspwrqz2kxxwta"
     }
    }'
+```
+
+expect
+
+```
+{"provider": {"providerId": "1", "providerType": "CSP", "name": "Oracle Cloud Infrastructure", "accountId": "ocid1.tenancy.oc1..aaaaaaaagfqbe4ujb2dgwxtp37gzinrxt6h6hfshjokfgfi5nzquxmfpzkyq"}, "source": {"sourceName": "Cloud Guard", "sourceId": "None"}, "event": {"guid": "ocid1.cloudguardproblem.oc1.iad.amaaaaaa24o7ld2qphw36wghvk44yms2u3hm4wnzhvtgcakktusurhtepevq", "name": "Public Bucket", "shortDescription": "Object Storage supports anonymous, unauthenticated access to a bucket. A public bucket that has read access enabled for anonymous users allows anyone to obtain object metadata, download bucket objects, and optionally list bucket contents.", "startTime": "2021-08-28T16:37:36.945Z", "severity": "CRITICAL", "status": "OPEN", "recommendation": "Ensure that the bucket is sanctioned for public access, and if not, direct the OCI administrator to restrict the bucket policy to allow only specific users access to the resources required to accomplish their job functions."}, "resource": {"identifier": "orasenatdpltsecitom01/AutoVinci", "type": "Bucket", "name": "AutoVinci", "region": "us-phoenix-1", "zone": "McMillan"}}
 ```
