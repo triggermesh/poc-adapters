@@ -48,15 +48,15 @@ type KafkaClient interface {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 
-	BootstrapServers    []string `envconfig:"CONFLUENT_BOOTSTRAP_SERVERS" required:"true"`
-	Topic               string   `envconfig:"CONFLUENT_TOPIC" required:"true"`
-	GroupID             string   `envconfig:"CONFLUENT_GROUP_ID" required:"true" `
-	SecurityMechanisms  string   `envconfig:"CONFLUENT_SECURITY_MECANISMS" required:"false" default:"GSSAPI"`
-	SecurityProtocol    string   `envconfig:"CONFLUENT_SECURITY_PROTOCOL" required:"false" default:"SASL_SSL"`
-	KerberosPrincipal   string   `envconfig:"KERBEROS_PRINCIPAL" required:"true" `
-	KerberosServiceName string   `envconfig:"KERBEROS_SERVICE_NAME" required:"true" `
-	SSLCALocation       string   `envconfig:"SSL_CA_LOCATION" required:"true"`
-	KerberosKeytab      string   `envconfig:"KERBEROS_KEYTAB" required:"true"`
+	BootstrapServers    string `envconfig:"CONFLUENT_BOOTSTRAP_SERVERS" required:"true"`
+	Topic               string `envconfig:"CONFLUENT_TOPIC" required:"true"`
+	GroupID             string `envconfig:"CONFLUENT_GROUP_ID" required:"true" `
+	SecurityMechanisms  string `envconfig:"CONFLUENT_SECURITY_MECANISMS" required:"false" default:"GSSAPI"`
+	SecurityProtocol    string `envconfig:"CONFLUENT_SECURITY_PROTOCOL" required:"false" default:"SASL_SSL"`
+	KerberosPrincipal   string `envconfig:"KERBEROS_PRINCIPAL" required:"true" `
+	KerberosServiceName string `envconfig:"KERBEROS_SERVICE_NAME" required:"true" `
+	SSLCALocation       string `envconfig:"SSL_CA_LOCATION" required:"true"`
+	KerberosKeytab      string `envconfig:"KERBEROS_KEYTAB" required:"true"`
 
 	// This set of variables are experimental and not graduated to the CRD.
 	BrokerVersionFallback       string `envconfig:"CONFLUENT_BROKER_VERSION_FALLBACK" required:"false" default:"0.10.0.0"`
