@@ -20,9 +20,65 @@ spec:
   template:
     spec:
       containers:
-        - image: gcr.io/triggermesh/cgcsnf:latest
+        - image: gcr.io/triggermesh/csnfeventtransformation:latest
           env:
           - name: K_SINK
-            value: http://tmdebugger-default.marlinspike.io
+            value: http://sockeye.default.tmkongdemo.triggermesh.io
+          - name: AQUASEC_TYPE
+            value: as
+          - name: CLOUDGUARD_TYPE
+            value: cg
+          - name: AZURE_TYPE
+            value: az
 
 ---
+
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: gcloudgard-trigger
+spec:
+  filter:
+    type: as
+  broker: brkr
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: gcloudgard-transformation
+
+---
+
+# apiVersion: targets.triggermesh.io/v1alpha1
+# kind: AWSSQSTarget
+# metadata:
+#     name: sqssink
+# spec:
+#     arn: arn:aws:sqs:us-west-2:925906438773:DemoQueue
+#     awsApiKey:
+#         secretKeyRef:
+#             key: access_key_id
+#             name: aws
+#     awsApiSecret:
+#         secretKeyRef:
+#             key: secret_access_key
+#             name: aws
+#     discardCloudEventContext: false
+
+# ---
+
+# apiVersion: eventing.knative.dev/v1
+# kind: Trigger
+# metadata:
+#   labels:
+#   name: sqssinks
+# spec:
+#   broker: mqbroker
+#   filter:
+#     attributes:
+#       type: io.triggermesh.csnf.cloudguard
+#   subscriber:
+#     ref:
+#       apiVersion: targets.triggermesh.io/v1alpha1
+#       kind: AWSSQSTarget
+#       name: sqssink

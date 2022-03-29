@@ -1,0 +1,88 @@
+apiVersion: flow.triggermesh.io/v1alpha1
+kind: Transformation
+metadata:
+  name: cloudguard-transformation
+spec:
+  sink:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: tmdebugger
+  data:
+  - operation: parse
+    paths:
+    - key: data
+      value: JSON
+  - operation: store
+    paths:
+    - key: $accountID
+      value: data.additionalDetails.tenantId
+    - key: $eventGUID
+      value: data.resourceId
+    - key: $eventName"
+      value: data.additionalDetails.problemName
+    - key: $eventShortDescription
+      value: data.additionalDetails.problemDescription
+    - key: $eventStartTime
+      value: data.additionalDetails.firstDetected
+    - key: $eventSeverity
+      value: data.additionalDetails.riskLevel
+    - key: $eventStatus
+      value: data.additionalDetails.status
+    - key: $resourceIdentifier
+      value: data.additionalDetails.resourceId
+    - key: $resourceType
+      value: data.additionalDetails.resourceType
+    - key: $resourceName
+      value: data.additionalDetails.resourceName
+    - key: $resourceRegion
+      value: data.additionalDetails.region
+    - key: $resourceZone
+      value: data.compartmentName
+    - key: $providerAccountId
+      value: data.additionalDetails.tenantId
+    - key: $resourceName
+      value: data.additionalDetails.resourceName
+    - key: $resourceName
+      value: data.additionalDetails.resourceName
+
+  - operation: delete
+    paths:
+    - key:
+
+  - operation: add
+    paths:
+    - key: provider
+      value: Oracle Cloud Infrastructure
+    - key: providerType
+      value: CSP
+    - key: providerId
+      value: "1"
+    - key: source.sourceName
+      value: Cloud Guard
+    - key: source.sourceId
+      value: none
+    - key: provider.accountId
+      value: $accountID
+    - key: event.guid
+      value: $eventGUID
+    - key: event.name
+      value: $eventName
+    - key: event.shortDescription
+      value: $eventShortDescription
+    - key: event.startTime
+      value: $eventStartTime
+    - key: event.severity
+      value: $eventSeverity
+    - key: event.status
+      value: $eventStatus
+    - key: resource.identifier
+      value: $resourceIdentifier
+    - key: resource.type
+      value: $resourceType
+    - key: resource.name
+      value: $resourceName
+    - key: resource.region
+      value: $resourceRegion
+    - key: resource.zone
+      value: $resourceZone

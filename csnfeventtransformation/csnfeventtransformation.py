@@ -14,8 +14,6 @@
 
 from flask import Flask, request, make_response
 from cloudevents.http import CloudEvent, to_binary, from_http, to_structured
-
-
 import requests
 import simplejson
 import json
@@ -25,15 +23,32 @@ from onug_decorator import onug
 
 app = Flask(__name__)
 
+aquasecType = os.environ.get('AQUASEC_TYPE')
+cloudGuardType = os.environ.get('CLOUDGUARD_TYPE')
+azureType = os.environ.get('AZURE_TYPE')
 
-# create an endpoint at http://localhost:/8080/
+
 @app.route("/", methods=["POST"])
 def home():
     event = from_http(request.headers, request.get_data())
     message = json.loads(request.data.decode('utf-8'))
+    provider = ""
+
+    if aquasecType == event['type']:
+        provider = "Aquasec"
+
+    if cloudGuardType == event['type']:
+        provider = "CloudGuard"
+
+    if azureType == event['type']:
+        provider = "Azure"
+
+    if provider == "":
+        return make_response("Unknown event type", 400)
+
 
     url = 'https://objectstorage.us-ashburn-1.oraclecloud.com/n/orasenatdpltsecitom01/b/HammerPublic/o/file.json'
-    onugMSG = onug(url,message)
+    onugMSG = onug(url,message, provider)
 
     attributes = {
         "type": "io.triggermesh.csnf.cloudguard",
@@ -43,17 +58,19 @@ def home():
     }
 
     data = simplejson.dumps(onugMSG.get_finding())
+    print("data---")
     print(data)
-
-    revent = CloudEvent(attributes, onugMSG)
-    headers, body = to_binary(revent)
+    print("data---")
+    revent = CloudEvent(attributes, onugMSG.get_finding())
+    headers, body = to_structured(revent)
     sink = os.environ.get('K_SINK')
 
     if sink != "" :
-        requests.post(sink, data=data, headers=headers)
-        return "", 200
+       r = requests.post(sink, data=body, headers=headers)
+       print(f"{r}")
+        # return "", 200
 
-    return (data, 200)
+    return (body, 200)
 
 if __name__ == "__main__":
     app.run(port=8080)
