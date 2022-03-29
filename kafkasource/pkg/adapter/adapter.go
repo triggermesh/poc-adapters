@@ -41,10 +41,10 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 
-	BootstrapServers    []string `envconfig:"CONFLUENT_BOOTSTRAP_SERVERS" required:"true"`
+	BootstrapServers    string   `envconfig:"CONFLUENT_BOOTSTRAP_SERVERS" required:"true"`
 	Topics              []string `envconfig:"CONFLUENT_TOPICS" required:"true"`
 	GroupID             string   `envconfig:"CONFLUENT_GROUP_ID" required:"true"`
-	SecurityMechanisms  string   `envconfig:"CONFLUENT_SECURITY_MECANISMS" required:"false" default:"GSSAPI"`
+	SecurityMechanisms  string   `envconfig:"CONFLUENT_SECURITY_MECHANISMS" required:"false" default:"GSSAPI"`
 	SecurityProtocol    string   `envconfig:"CONFLUENT_SECURITY_PROTOCOL" required:"false" default:"SASL_SSL"`
 	KerberosPrincipal   string   `envconfig:"KERBEROS_PRINCIPAL" required:"true"`
 	KerberosServiceName string   `envconfig:"KERBEROS_SERVICE_NAME" required:"true"`
