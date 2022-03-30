@@ -64,7 +64,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		"fetch.max.bytes":            1000000000,
 		"fetch.wait.max.ms":          1 * time.Second,
 		"security.protocol":          env.SecurityProtocol,
-		"security.mecanisms":         env.SecurityMechanisms,
+		"sasl.mechanisms":         env.SecurityMechanisms,
 		"sasl.kerberos.service.name": env.KerberosServiceName,
 		"sasl.kerberos.principal":    env.KerberosPrincipal,
 		"sasl.kerberos.keytab":       env.KerberosKeytab,
