@@ -66,25 +66,25 @@ const getTokenResponse = await cca.acquireTokenByClientCredential(tokenRequest);
     res.status(415).header("Content-Type", "application/json").send(JSON.stringify(err));
   }
 
+  console.log(event);
+
 
   const incident = {
       "properties": {
           "severity": "High",
           "status": "Active",
-          "title": event.data.event.event.metadata.name,
-          "description": event.data.event.event.metadata.shortDescription,
+          "title": event.data.event.name,
+          "description": event.data.event.shortDescription,
           "additionalData": {
               "alertProductNames": [
-                event.data.event.event.resources[0].platform,
-                event.data.event.event.resources[0].accountId,
-                event.data.event.event.resources[0].region,
-                event.data.event.event.resources[0].service,
-                event.data.event.event.resources[0].type + ':' + event.data.event.event.resources[0].name + ':' + event.data.event.event.resources[0].guid
+                event.data.provider.accountId,
+                event.data.resource.region,
+                event.data.resource.type + ':' + event.data.resource.name + ':' + event.data.event.guid
               ]
           },
           "labels": [
               {
-                  "labelName": event.data.event.event.reporter.name,
+                  "labelName": event.data.event.name,
                   "labelType": "User"
               }
           ]

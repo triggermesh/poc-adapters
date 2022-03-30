@@ -9,42 +9,42 @@ spec:
       kind: Service
       name: tmdebugger
   data:
-  - operation: parse
-    paths:
-    - key: data
-      value: JSON
+  # - operation: parse
+  #   paths:
+  #   - key: data
+  #     value: JSON
   - operation: store
     paths:
     - key: $accountID
-      value: data.additionalDetails.tenantId
+      value: data.data.additionalDetails.tenantId
     - key: $eventGUID
-      value: data.resourceId
+      value: data.data.resourceId
     - key: $eventName"
-      value: data.additionalDetails.problemName
+      value: data.data.additionalDetails.problemName
     - key: $eventShortDescription
-      value: data.additionalDetails.problemDescription
+      value: data.data.additionalDetails.problemDescription
     - key: $eventStartTime
-      value: data.additionalDetails.firstDetected
+      value: data.data.additionalDetails.firstDetected
     - key: $eventSeverity
-      value: data.additionalDetails.riskLevel
+      value: data.data.additionalDetails.riskLevel
     - key: $eventStatus
-      value: data.additionalDetails.status
+      value: data.data.additionalDetails.status
     - key: $resourceIdentifier
-      value: data.additionalDetails.resourceId
+      value: data.data.additionalDetails.resourceId
     - key: $resourceType
-      value: data.additionalDetails.resourceType
+      value: data.data.additionalDetails.resourceType
     - key: $resourceName
-      value: data.additionalDetails.resourceName
+      value: data.data.additionalDetails.resourceName
     - key: $resourceRegion
-      value: data.additionalDetails.region
+      value: data.data.additionalDetails.region
     - key: $resourceZone
-      value: data.compartmentName
+      value: data.data.compartmentName
     - key: $providerAccountId
-      value: data.additionalDetails.tenantId
+      value: data.data.additionalDetails.tenantId
     - key: $resourceName
-      value: data.additionalDetails.resourceName
+      value: data.data.additionalDetails.resourceName
     - key: $resourceName
-      value: data.additionalDetails.resourceName
+      value: data.data.additionalDetails.resourceName
 
   - operation: delete
     paths:
