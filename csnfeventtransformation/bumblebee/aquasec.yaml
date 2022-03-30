@@ -11,28 +11,36 @@ spec:
   data:
   - operation: parse
     paths:
-    - key: result[0].data
+    - key: Body
       value: JSON
   - operation: store
     paths:
     - key: $control
-      value: result[0].data.control
+      value: Body.data.control
     - key: $id
-      value: result[0].id
+      value: Body.data.id
+    - key: $hostid
+      value: Body.data.hostid
     - key: $reason
-      value: result[0].data.reason
+      value: Body.data.reason
     - key: $time
-      value: result[0].time
+      value: Body.data.time
     - key: $containerid
-      value: result[0].data.containerid
+      value: Body.data.containerid
     - key: $category
-      value: result[0].data.category
+      value: Body.data.category
     - key: $container
-      value: result[0].data.container
+      value: Body.data.container
     - key: $region
-      value: result[0].data.vm_location
+      value: Body.data.vm_location
     - key: $image
-      value: result[0].data.image
+      value: Body.data.image
+    - key: $name
+      value: Body.data.container
+    - key: $guid
+      value: Body.data.containerid
+    - key: $tatic
+      value: Body.data.tatic
 
   - operation: delete
     paths:
@@ -40,41 +48,37 @@ spec:
 
   - operation: add
     paths:
-    - key: dictionary.name
-      value: empty
-    - key: dictionary.version
-      value: "0.0.1"
-    - key: event.name
-      value: $control
-    - key: event.guid
+    - key: provider
+      value: Aquasec
+    - key: providerType
+      value: aquasec
+    - key: providerId
       value: $id
-    - key: event.url
-      value: ""
+    - key: source.sourceName
+      value: Aquasec
+    - key: source.sourceId
+      value: none
+    - key: provider.accountId
+      value: $id
+    - key: event.guid
+      value: $guid
+    - key: event.name
+      value: $name
     - key: event.shortDescription
-      value: $reason
-    - key: event.longDescription
-      value: $reason
-    - key: event.severity
-      value: high
-    - key: event.time
+      value: "an aquasec short description goes here"
+    - key: event.startTime
       value: $time
-    - key: reporter.name
-      value: Aqua Security
-    - key: producer.name
-      value: Aqua Security
-    - key: resource.accountId
-      value: ""
-    - key: resource.platform
-      value: Azure
-    - key: resource.guid
-      value: $containerid
+    - key: event.severity
+      value: HIGH
+    - key: event.status
+      value: OPEN
+    - key: resource.identifier
+      value: $id
     - key: resource.type
-      value: $category
+      value: $tatic
     - key: resource.name
-      value: $container
-    - key: resource.service
-      value: Azure Kubernetes Service
+      value: $hostid
     - key: resource.region
-      value: $region
-    - key: resource.package
-      value: $image
+      value: us-1-c
+    - key: resource.zone
+      value: us
