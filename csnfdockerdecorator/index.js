@@ -36,7 +36,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var axios_1 = require("axios");
 var express = require("express");
 var _a = require("cloudevents"), HTTP = _a.HTTP, CloudEvent = _a.CloudEvent;
 var app = express();
@@ -53,7 +52,7 @@ app.use(function (req, res, next) {
     });
 });
 app.post("/", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var evnt, csnfEvent, dockerhubDecorator, decoration, ce, message, ksink;
+    var evnt, csnfEvent, dockerhubDecorator, decoration;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -63,18 +62,17 @@ app.post("/", function (req, res) { return __awaiter(void 0, void 0, void 0, fun
                 return [4 /*yield*/, dockerhubDecorator.decorate(csnfEvent)];
             case 1:
                 decoration = _a.sent();
-                // console.log(decoration);
                 csnfEvent.decoration = decoration;
                 console.log(csnfEvent);
-                ce = new CloudEvent({ type: evnt.type + ".dockerhub.decorated", source: "dockerhubDecorator", data: csnfEvent });
-                message = HTTP.binary(ce);
-                message.headers['content-type'] = 'application/json';
-                ksink = process.env.K_SINK;
-                axios_1["default"].post(ksink, message.body, {
-                    headers: message.headers
-                });
-                res.status(200).header("Content-Type", "application/json").send(message.body);
-                return [2 /*return*/];
+                // const ce = new CloudEvent({ type:evnt.type+".dockerhub.decorated", source:"dockerhubDecorator", data: csnfEvent });
+                // const message = HTTP.binary(ce); // Or HTTP.structured(ce)
+                // message.headers['content-type'] = 'application/json';
+                // var  ksink = process.env.K_SINK;
+                // axios.post("http://broker-ingress.knative-eventing.svc.cluster.local/default/brkr",  message.body, {
+                //   headers: message.headers,
+                //   });
+                res.status(200).send();
+                return [2 /*return*/, res];
         }
     });
 }); });

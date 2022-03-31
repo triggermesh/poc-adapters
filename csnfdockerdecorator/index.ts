@@ -36,7 +36,8 @@ app.post("/", async (req, res) => {
     headers: message.headers,
     });
 
-  res.status(200).header("Content-Type", "application/json").send(message.body);
+  res.status(200).send();
+  return res;
 });
 
 app.listen(8080, () => {
