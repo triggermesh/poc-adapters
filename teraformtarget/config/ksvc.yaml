@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: teraform
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: teraform
+rules:
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - delete
+      - patch
+      - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: teraform
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: teraform
+subjects:
+  - kind: ServiceAccount
+    name: teraform
+    # UPDATE THIS TO MATCH YOUR NAMESPACE:
+    namespace: default
+---
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: terraform-target
+spec:
+  template:
+    spec:
+      serviceAccountName: teraform
+      containers:
+        - image: gcr.io/triggermesh/terraformtarget:latest
+          env:
+          - name: TERAFORMTARGET_WORKING_DIR
+            value: /
+          - name: TERAFORMTARGET_TERRAFORM_PLAN
+            value: |-
+              provider "kubernetes" {
+                # Context to choose from the config file. use only for local development
+                # config_path    = "/project/cmd/"
+                # config_context = "arn:aws:eks:us-west-2:043455440429:cluster/tmkongdemo"
+              }
+              #-----------------------------------------
+              # KUBERNETES DEPLOYMENT COLOR APP
+              #-----------------------------------------
+              resource "kubernetes_deployment" "color" {
+                  metadata {
+                      name = "color-blue-dep"
+                      labels = {
+                          app   = "color"
+                          color = "blue"
+                      } //labels
+                  } //metadata
+
+                  spec {
+                      selector {
+                          match_labels = {
+                              app   = "color"
+                              color = "blue"
+                          } //match_labels
+                      } //selector
+                      #Template for the creation of the pod
+                      template {
+                          metadata {
+                              labels = {
+                                  app   = "color"
+                                  color = "blue"
+                              } //labels
+                          } //metadata
+                          spec {
+                              container {
+                                  image = "itwonderlab/color"   #Docker image name
+                                  name  = "color-blue"          #Name of the container specified as a DNS_LABEL. Each container in a pod must have a unique name (DNS_LABEL).
+
+                                  #Block of string name and value pairs to set in the containers environment
+                                  env {
+                                      name = "COLOR"
+                                      value = "blue"
+                                  } //env
+
+                                  #List of ports to expose from the container.
+                                  port {
+                                      container_port = 8080
+                                  }//port
+                              } //container
+                          } //spec
+                      } //template
+                  } //spec
+              } //resource
