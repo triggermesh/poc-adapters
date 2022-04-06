@@ -137,17 +137,17 @@ func (a *pathsadapteradapter) dispatch(ctx context.Context, event cloudevents.Ev
 		}
 	`)
 	if err != nil {
-		a.logger.Errorf("Error running script: %v", err)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "running script")
 	}
 
 	value, err := vm.Get("response")
 	if err != nil {
-		a.logger.Errorf("Error getting response: %v", err)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "getting response")
 	}
 
 	value_int, err := value.ToInteger()
 	if err != nil {
-		a.logger.Errorf("Error getting response: %v", err)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "getting response to integer")
 	}
 
 	if value_int == 0 {
@@ -156,6 +156,7 @@ func (a *pathsadapteradapter) dispatch(ctx context.Context, event cloudevents.Ev
 		ctx := cloudevents.ContextWithTarget(context.Background(), a.defaultContinuePath)
 		if result := a.ceClient.Send(ctx, event); cloudevents.IsUndelivered(result) {
 			log.Fatalf("failed to send, %v", result)
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, result, "failed to send event to default path")
 		}
 	}
 
@@ -165,6 +166,8 @@ func (a *pathsadapteradapter) dispatch(ctx context.Context, event cloudevents.Ev
 		ctx := cloudevents.ContextWithTarget(context.Background(), a.pathAContinuePath)
 		if result := a.ceClient.Send(ctx, event); cloudevents.IsUndelivered(result) {
 			log.Fatalf("failed to send, %v", result)
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "getting response to path a")
+
 		}
 	}
 
@@ -174,6 +177,7 @@ func (a *pathsadapteradapter) dispatch(ctx context.Context, event cloudevents.Ev
 		ctx := cloudevents.ContextWithTarget(context.Background(), a.pathBContinuePath)
 		if result := a.ceClient.Send(ctx, event); cloudevents.IsUndelivered(result) {
 			log.Fatalf("failed to send, %v", result)
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "getting response to path B")
 		}
 	}
 
