@@ -77,7 +77,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
 
-	return &pathsadapteradapter{
+	return &pathsadapter{
 		pathAContinueIf:   env.PathAContinueIf,
 		pathAContinueType: env.PathAContinueType,
 		pathAContinuePath: env.PathAContinuePath,
@@ -96,9 +96,9 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 }
 
-var _ pkgadapter.Adapter = (*pathsadapteradapter)(nil)
+var _ pkgadapter.Adapter = (*pathsadapter)(nil)
 
-type pathsadapteradapter struct {
+type pathsadapter struct {
 	pathAContinueIf   string
 	pathAContinuePath string
 	pathAContinueType string
@@ -117,13 +117,13 @@ type pathsadapteradapter struct {
 
 // Start is a blocking function and will return if an error occurs
 // or the context is cancelled.
-func (a *pathsadapteradapter) Start(ctx context.Context) error {
+func (a *pathsadapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting Path Adapter")
 
 	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
-func (a *pathsadapteradapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
+func (a *pathsadapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	vm := otto.New()
 	vm.Set("event", string(event.Data()))
 	vm.Set("response", 0)
