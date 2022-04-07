@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.17-buster AS builder
-WORKDIR /project
-COPY . ./
-RUN cd /project/cmd && go build -o /project/bin/azuresentineltarget
-
-FROM registry.access.redhat.com/ubi8/ubi-minimal
-EXPOSE 8080
-COPY --from=builder /project/bin/azuresentineltarget /azuresentineltarget
-
-ENTRYPOINT ["/azuresentineltarget"]
+apiVersion: components.extensions.triggermesh.io/v1alpha1
+kind: AZURESENTINELTARGET
+metadata:
+  name: azuresentineltarget
+spec:
+  sink:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: tmdebugger
