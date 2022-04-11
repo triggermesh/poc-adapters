@@ -21,14 +21,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
-	"time"
 
 	"github.com/Azure/go-autorest/autorest"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"go.uber.org/zap"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
@@ -42,33 +39,10 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 	return &envAccessor{}
 }
 
-type envAccessor struct {
-	pkgadapter.EnvConfig
-	SubscriptionID string `envconfig:"AZURE_SUBSCRIPTION_ID" required:"true"`
-	ResourceGroup  string `envconfig:"AZURE_RESOURCE_GROUP" required:"true"`
-	Workspace      string `envconfig:"AZURE_WORKSPACE" required:"true"`
-	ClientSecret   string `envconfig:"AZURE_CLIENT_SECRET" required:"true"`
-	ClientID       string `envconfig:"AZURE_CLIENT_ID" required:"true"`
-	TenantID       string `envconfig:"AZURE_TENANT_ID" required:"true"`
-	// BridgeIdentifier is the name of the bridge workflow this target is part of
-	BridgeIdentifier string `envconfig:"EVENTS_BRIDGE_IDENTIFIER"`
-	// CloudEvents responses parametrization
-	CloudEventPayloadPolicy string `envconfig:"EVENTS_PAYLOAD_POLICY" default:"error"`
-	// Sink defines the target sink for the events. If no Sink is defined the
-	// events are replied back to the sender.
-	Sink string `envconfig:"K_SINK"`
-}
-
 // NewAdapter adapter implementation
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
-
-	uid := uuid.New().String()
-
-	fmt.Println("uid: ", uid)
-
-	rURL := `https://management.azure.com/subscriptions/` + env.SubscriptionID + `/resourceGroups/` + env.ResourceGroup + `/providers/Microsoft.OperationalInsights/workspaces/` + env.Workspace + `/providers/Microsoft.SecurityInsights/incidents/9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d?api-version=2020-01-01`
 
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
@@ -79,12 +53,14 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	}
 
 	return &azuresentineltargetadapter{
-		client:     http.DefaultClient,
-		requestURL: rURL,
-		incidendID: uuid.New(),
-		clientID:   env.ClientID,
-		tenantID:   env.TenantID,
-		azureCreds: env.ClientSecret,
+		client:         http.DefaultClient,
+		clientID:       env.ClientID,
+		tenantID:       env.TenantID,
+		azureCreds:     env.ClientSecret,
+		subscriptionID: env.SubscriptionID,
+		resourceGroup:  env.ResourceGroup,
+		workspace:      env.Workspace,
+		clientSecret:   env.ClientSecret,
 
 		sink:     env.Sink,
 		replier:  replier,
@@ -95,85 +71,6 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 var _ pkgadapter.Adapter = (*azuresentineltargetadapter)(nil)
 
-type Incident struct {
-	Properties struct {
-		Severity       string `json:"severity"`
-		Status         string `json:"status"`
-		Title          string `json:"title"`
-		Description    string `json:"description"`
-		AdditionalData struct {
-			AlertProductNames []string `json:"alertProductNames"`
-		} `json:"additionalData"`
-		Labels []struct {
-			LabelName string `json:"labelName"`
-			LabelType string `json:"labelType"`
-		} `json:"labels"`
-	} `json:"properties"`
-}
-
-type expectedEvent struct {
-	Event struct {
-		Event struct {
-			Metadata struct {
-				GUID             int         `json:"guid"`
-				Name             string      `json:"name"`
-				URL              interface{} `json:"url"`
-				Severity         string      `json:"severity"`
-				ShortDescription string      `json:"shortDescription"`
-				LongDescription  string      `json:"longDescription"`
-				Time             int         `json:"time"`
-			} `json:"metadata"`
-			Producer struct {
-				Name string `json:"name"`
-			} `json:"producer"`
-			Reporter struct {
-				Name string `json:"name"`
-			} `json:"reporter"`
-			Resources []struct {
-				GUID      string `json:"guid"`
-				Name      string `json:"name"`
-				Region    string `json:"region"`
-				Platform  string `json:"platform"`
-				Service   string `json:"service"`
-				Type      string `json:"type"`
-				AccountID string `json:"accountId"`
-				Package   string `json:"package"`
-			} `json:"resources"`
-		} `json:"event"`
-		Decoration []struct {
-			Decorator string    `json:"decorator"`
-			Timestamp time.Time `json:"timestamp"`
-			Payload   struct {
-				Registry         string    `json:"registry"`
-				Namespace        string    `json:"namespace"`
-				Image            string    `json:"image"`
-				Tag              string    `json:"tag"`
-				Digests          []string  `json:"digests"`
-				ImageLastUpdated time.Time `json:"imageLastUpdated"`
-				TagLastUpdated   time.Time `json:"tagLastUpdated"`
-				Description      string    `json:"description"`
-				StarCount        int       `json:"starCount"`
-				PullCount        int64     `json:"pullCount"`
-			} `json:"payload"`
-		} `json:"decoration"`
-	} `json:"event"`
-	Sourcetype string `json:"sourcetype"`
-}
-
-type azuresentineltargetadapter struct {
-	client     *http.Client
-	requestURL string
-	incidendID uuid.UUID
-	clientID   string
-	tenantID   string
-	azureCreds string
-
-	sink     string
-	replier  *targetce.Replier
-	ceClient cloudevents.Client
-	logger   *zap.SugaredLogger
-}
-
 // Start is a blocking function and will return if an error occurs
 // or the context is cancelled.
 func (a *azuresentineltargetadapter) Start(ctx context.Context) error {
@@ -182,7 +79,9 @@ func (a *azuresentineltargetadapter) Start(ctx context.Context) error {
 }
 
 func (a *azuresentineltargetadapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
-	// a.logger.Infof("Received event: %v", event)
+	uid := uuid.New().String()
+	rURL := `https://management.azure.com/subscriptions/` + a.subscriptionID + `/resourceGroups/` + a.resourceGroup + `/providers/Microsoft.OperationalInsights/workspaces/` + a.workspace + `/providers/Microsoft.SecurityInsights/incidents/` + uid + `?api-version=2020-01-01`
+
 	ee := &expectedEvent{}
 	if err := event.DataAs(ee); err != nil {
 		a.logger.Errorf("Error decoding event: %v", err)
@@ -217,47 +116,28 @@ func (a *azuresentineltargetadapter) dispatch(ctx context.Context, event cloudev
 		return nil, nil
 	}
 
-	// config := auth.NewDeviceFlowConfig(a.clientID, a.tenantID)
-	// autho, err := config.Authorizer()
-
-	// cred, err := confidential.NewCredFromSecret(a.azureCreds)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("could not create a cred from a secret: %w", err)
-	// }
-
-	// confidentialClientApp, err := confidential.New(a.clientID, cred, confidential.WithAuthority("https://login.microsoftonline.com/Enter_The_Tenant_Name_Here"))
-
 	reqBody, err := json.Marshal(*i)
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "marshaling request for retrieving an access token")
 	}
 
-	request, err := http.NewRequest(http.MethodPut, a.requestURL, bytes.NewBuffer(reqBody))
+	request, err := http.NewRequest(http.MethodPut, rURL, bytes.NewBuffer(reqBody))
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating request token")
 	}
 
 	request.Header.Set("Content-Type", "application/json")
-	// request.Header.Set("Authorization", "Bearer ")
 
 	req, err := autorest.Prepare(request,
 		authorizer.WithAuthorization())
-	fmt.Println(authorizer.WithAuthorization())
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "preparing request")
 	}
-
-	fmt.Println(req)
 
 	res, err := autorest.Send(req)
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "sending request")
 	}
-
-	// res, err := a.client.Do(request)
-	// if err != nil {
-	// 	return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "processing auth request")
-	// }
 
 	defer res.Body.Close()
 
@@ -266,14 +146,9 @@ func (a *azuresentineltargetadapter) dispatch(ctx context.Context, event cloudev
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "reading response body ")
 	}
 
-	fmt.Println(string(body))
-	fmt.Println(res.StatusCode)
+	if res.StatusCode != 201 {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "invalid response from Azure: "+string(body))
+	}
 
-	// if res.StatusCode != http.StatusOK {
-	// 	return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "invalid response from Azure")
-	// }
-
-	fmt.Println(string(body))
-
-	return nil, cloudevents.ResultACK
+	return a.replier.Ok(&event, body)
 }
