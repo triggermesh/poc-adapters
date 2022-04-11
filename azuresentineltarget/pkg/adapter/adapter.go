@@ -64,7 +64,11 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
 
-	rURL := `https://management.azure.com/subscriptions/` + env.SubscriptionID + `/resourceGroups/` + env.ResourceGroup + `/providers/Microsoft.OperationalInsights/workspaces/` + env.Workspace + `/providers/Microsoft.OperationalInsights/sources/` + env.BridgeIdentifier + `/events?api-version=2018-11-01`
+	uid := uuid.New().String()
+
+	fmt.Println("uid: ", uid)
+
+	rURL := `https://management.azure.com/subscriptions/` + env.SubscriptionID + `/resourceGroups/` + env.ResourceGroup + `/providers/Microsoft.OperationalInsights/workspaces/` + env.Workspace + `/providers/Microsoft.SecurityInsights/incidents/9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d?api-version=2020-01-01`
 
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
@@ -204,6 +208,8 @@ func (a *azuresentineltargetadapter) dispatch(ctx context.Context, event cloudev
 			LabelType: "User",
 		},
 	}
+	i.Properties.Severity = "High"
+	i.Properties.Status = "Active"
 
 	authorizer, err := auth.NewAuthorizerFromEnvironment()
 	if err != nil {
@@ -226,17 +232,22 @@ func (a *azuresentineltargetadapter) dispatch(ctx context.Context, event cloudev
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "marshaling request for retrieving an access token")
 	}
 
-	request, err := http.NewRequest(http.MethodPost, a.requestURL, bytes.NewBuffer(reqBody))
+	request, err := http.NewRequest(http.MethodPut, a.requestURL, bytes.NewBuffer(reqBody))
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating request token")
 	}
 
 	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Authorization", "Bearer ")
+	// request.Header.Set("Authorization", "Bearer ")
 
 	req, err := autorest.Prepare(request,
 		authorizer.WithAuthorization())
 	fmt.Println(authorizer.WithAuthorization())
+	if err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "preparing request")
+	}
+
+	fmt.Println(req)
 
 	res, err := autorest.Send(req)
 	if err != nil {
