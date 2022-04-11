@@ -71,8 +71,6 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 var _ pkgadapter.Adapter = (*azuresentineltargetadapter)(nil)
 
-// Start is a blocking function and will return if an error occurs
-// or the context is cancelled.
 func (a *azuresentineltargetadapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting AZURESENTINELTARGET Adapter")
 	return a.ceClient.StartReceiver(ctx, a.dispatch)
