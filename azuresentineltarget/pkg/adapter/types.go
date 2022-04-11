@@ -1,0 +1,109 @@
+package azuresentineltarget
+
+import (
+	"net/http"
+	"time"
+
+	cloudevents "github.com/cloudevents/sdk-go/v2"
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
+	"go.uber.org/zap"
+	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+)
+
+type envAccessor struct {
+	pkgadapter.EnvConfig
+	SubscriptionID string `envconfig:"AZURE_SUBSCRIPTION_ID" required:"true"`
+	ResourceGroup  string `envconfig:"AZURE_RESOURCE_GROUP" required:"true"`
+	Workspace      string `envconfig:"AZURE_WORKSPACE" required:"true"`
+	ClientSecret   string `envconfig:"AZURE_CLIENT_SECRET" required:"true"`
+	ClientID       string `envconfig:"AZURE_CLIENT_ID" required:"true"`
+	TenantID       string `envconfig:"AZURE_TENANT_ID" required:"true"`
+	// BridgeIdentifier is the name of the bridge workflow this target is part of
+	BridgeIdentifier string `envconfig:"EVENTS_BRIDGE_IDENTIFIER"`
+	// CloudEvents responses parametrization
+	CloudEventPayloadPolicy string `envconfig:"EVENTS_PAYLOAD_POLICY" default:"error"`
+	// Sink defines the target sink for the events. If no Sink is defined the
+	// events are replied back to the sender.
+	Sink string `envconfig:"K_SINK"`
+}
+
+type Incident struct {
+	Properties struct {
+		Severity       string `json:"severity"`
+		Status         string `json:"status"`
+		Title          string `json:"title"`
+		Description    string `json:"description"`
+		AdditionalData struct {
+			AlertProductNames []string `json:"alertProductNames"`
+		} `json:"additionalData"`
+		Labels []struct {
+			LabelName string `json:"labelName"`
+			LabelType string `json:"labelType"`
+		} `json:"labels"`
+	} `json:"properties"`
+}
+
+type expectedEvent struct {
+	Event struct {
+		Event struct {
+			Metadata struct {
+				GUID             int         `json:"guid"`
+				Name             string      `json:"name"`
+				URL              interface{} `json:"url"`
+				Severity         string      `json:"severity"`
+				ShortDescription string      `json:"shortDescription"`
+				LongDescription  string      `json:"longDescription"`
+				Time             int         `json:"time"`
+			} `json:"metadata"`
+			Producer struct {
+				Name string `json:"name"`
+			} `json:"producer"`
+			Reporter struct {
+				Name string `json:"name"`
+			} `json:"reporter"`
+			Resources []struct {
+				GUID      string `json:"guid"`
+				Name      string `json:"name"`
+				Region    string `json:"region"`
+				Platform  string `json:"platform"`
+				Service   string `json:"service"`
+				Type      string `json:"type"`
+				AccountID string `json:"accountId"`
+				Package   string `json:"package"`
+			} `json:"resources"`
+		} `json:"event"`
+		Decoration []struct {
+			Decorator string    `json:"decorator"`
+			Timestamp time.Time `json:"timestamp"`
+			Payload   struct {
+				Registry         string    `json:"registry"`
+				Namespace        string    `json:"namespace"`
+				Image            string    `json:"image"`
+				Tag              string    `json:"tag"`
+				Digests          []string  `json:"digests"`
+				ImageLastUpdated time.Time `json:"imageLastUpdated"`
+				TagLastUpdated   time.Time `json:"tagLastUpdated"`
+				Description      string    `json:"description"`
+				StarCount        int       `json:"starCount"`
+				PullCount        int64     `json:"pullCount"`
+			} `json:"payload"`
+		} `json:"decoration"`
+	} `json:"event"`
+	Sourcetype string `json:"sourcetype"`
+}
+
+type azuresentineltargetadapter struct {
+	client         *http.Client
+	clientID       string
+	tenantID       string
+	azureCreds     string
+	subscriptionID string
+	resourceGroup  string
+	workspace      string
+	clientSecret   string
+
+	sink     string
+	replier  *targetce.Replier
+	ceClient cloudevents.Client
+	logger   *zap.SugaredLogger
+}

@@ -20,7 +20,7 @@ spec:
   template:
     spec:
       containers:
-        - image:
+        - image: gcr.io/triggermesh/azuresentineltarget:latest
           env:
           - name: AZURE_SUBSCRIPTION_ID
             value: <SINK_URL>
