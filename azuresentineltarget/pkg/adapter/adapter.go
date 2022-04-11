@@ -79,15 +79,56 @@ func (a *azuresentineltargetadapter) Start(ctx context.Context) error {
 }
 
 func (a *azuresentineltargetadapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
-	uid := uuid.New().String()
-	rURL := `https://management.azure.com/subscriptions/` + a.subscriptionID + `/resourceGroups/` + a.resourceGroup + `/providers/Microsoft.OperationalInsights/workspaces/` + a.workspace + `/providers/Microsoft.SecurityInsights/incidents/` + uid + `?api-version=2020-01-01`
-
 	ee := &expectedEvent{}
 	if err := event.DataAs(ee); err != nil {
 		a.logger.Errorf("Error decoding event: %v", err)
 		return nil, nil
 	}
 
+	authorizer, err := auth.NewAuthorizerFromEnvironment()
+	if err != nil {
+		a.logger.Errorf("Error creating Azure authorizer: %v", err)
+		return nil, nil
+	}
+
+	incident := createIncident(*ee)
+	reqBody, err := json.Marshal(*incident)
+	if err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "marshaling request for retrieving an access token")
+	}
+
+	rURL := `https://management.azure.com/subscriptions/` + a.subscriptionID + `/resourceGroups/` + a.resourceGroup + `/providers/Microsoft.OperationalInsights/workspaces/` + a.workspace + `/providers/Microsoft.SecurityInsights/incidents/` + uuid.New().String() + `?api-version=2020-01-01`
+	request, err := http.NewRequest(http.MethodPut, rURL, bytes.NewBuffer(reqBody))
+	if err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating request token")
+	}
+
+	request.Header.Set("Content-Type", "application/json")
+	req, err := autorest.Prepare(request,
+		authorizer.WithAuthorization())
+	if err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "preparing request")
+	}
+
+	res, err := autorest.Send(req)
+	if err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "sending request")
+	}
+
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "reading response body ")
+	}
+
+	if res.StatusCode != 201 {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "invalid response from Azure: "+string(body))
+	}
+
+	return a.replier.Ok(&event, body)
+}
+
+func createIncident(ee expectedEvent) *Incident {
 	i := &Incident{}
 	alertProductNames := []string{}
 	alertProductNames = append(alertProductNames, ee.Event.Event.Resources[0].Platform)
@@ -109,46 +150,5 @@ func (a *azuresentineltargetadapter) dispatch(ctx context.Context, event cloudev
 	}
 	i.Properties.Severity = "High"
 	i.Properties.Status = "Active"
-
-	authorizer, err := auth.NewAuthorizerFromEnvironment()
-	if err != nil {
-		a.logger.Errorf("Error creating Azure authorizer: %v", err)
-		return nil, nil
-	}
-
-	reqBody, err := json.Marshal(*i)
-	if err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "marshaling request for retrieving an access token")
-	}
-
-	request, err := http.NewRequest(http.MethodPut, rURL, bytes.NewBuffer(reqBody))
-	if err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating request token")
-	}
-
-	request.Header.Set("Content-Type", "application/json")
-
-	req, err := autorest.Prepare(request,
-		authorizer.WithAuthorization())
-	if err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "preparing request")
-	}
-
-	res, err := autorest.Send(req)
-	if err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "sending request")
-	}
-
-	defer res.Body.Close()
-
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "reading response body ")
-	}
-
-	if res.StatusCode != 201 {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "invalid response from Azure: "+string(body))
-	}
-
-	return a.replier.Ok(&event, body)
+	return i
 }
