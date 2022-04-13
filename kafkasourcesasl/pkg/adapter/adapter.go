@@ -144,8 +144,8 @@ func (a *kafkaAdapter) emitEvent(ctx context.Context, message string, topicParti
 	event.SetSubject("/kafka/target/event")
 	event.SetSource(*topicPartition.Topic)
 	event.SetID(topicPartition.Offset.String())
-	in := `{"message": ` + message + `}`
-	if err := event.SetData(cloudevents.ApplicationJSON, in); err != nil {
+	// in := `{"message": ` + message + `}`
+	if err := event.SetData(cloudevents.ApplicationJSON, []byte(message)); err != nil {
 		return fmt.Errorf("failed to set event data: %w", err)
 	}
 
