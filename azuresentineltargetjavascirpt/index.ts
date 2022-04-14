@@ -69,6 +69,7 @@ const getTokenResponse = await cca.acquireTokenByClientCredential(tokenRequest);
 
   const incident = {
       "properties": {
+          "providerIncidentId": event.data.event.event.resource.identifier,
           "severity": "High",
           "status": "Active",
           "title": event.data.event.event.metadata.name,
