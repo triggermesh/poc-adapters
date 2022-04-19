@@ -2,7 +2,6 @@ package azuresentineltarget
 
 import (
 	"net/http"
-	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
@@ -27,70 +26,112 @@ type envAccessor struct {
 	Sink string `envconfig:"K_SINK"`
 }
 
+type IncidentLabel struct {
+	LabelName string            `json:"labelName"`
+	LabelType IncidentLabelType `json:"labelType"`
+}
+
+type IncidentLabelType []struct {
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
+type IncidentOwnerInfo struct {
+	// ObjectId string `json:"objectId"`
+	AssignedTo string `json:"assignedTo"`
+}
+
 type Incident struct {
 	Properties struct {
-		Severity       string `json:"severity"`
-		Status         string `json:"status"`
-		Title          string `json:"title"`
-		Description    string `json:"description"`
-		AdditionalData struct {
+		Owner              IncidentOwnerInfo `json:"owner"`
+		ProviderIncidentId string            `json:"providerIncidentId"`
+		Severity           string            `json:"severity"`
+		Status             string            `json:"status"`
+		Title              string            `json:"title"`
+		Description        string            `json:"description"`
+		AdditionalData     struct {
 			AlertProductNames []string `json:"alertProductNames"`
 		} `json:"additionalData"`
-		Labels []struct {
-			LabelName string `json:"labelName"`
-			LabelType string `json:"labelType"`
-		} `json:"labels"`
+		// Labels IncidentLabel `json:"labels"`
 	} `json:"properties"`
 }
 
 type expectedEvent struct {
 	Event struct {
-		Event struct {
-			Metadata struct {
-				GUID             int         `json:"guid"`
-				Name             string      `json:"name"`
-				URL              interface{} `json:"url"`
-				Severity         string      `json:"severity"`
-				ShortDescription string      `json:"shortDescription"`
-				LongDescription  string      `json:"longDescription"`
-				Time             int         `json:"time"`
-			} `json:"metadata"`
-			Producer struct {
-				Name string `json:"name"`
-			} `json:"producer"`
-			Reporter struct {
-				Name string `json:"name"`
-			} `json:"reporter"`
-			Resources []struct {
-				GUID      string `json:"guid"`
-				Name      string `json:"name"`
-				Region    string `json:"region"`
-				Platform  string `json:"platform"`
-				Service   string `json:"service"`
-				Type      string `json:"type"`
-				AccountID string `json:"accountId"`
-				Package   string `json:"package"`
-			} `json:"resources"`
-		} `json:"event"`
-		Decoration []struct {
-			Decorator string    `json:"decorator"`
-			Timestamp time.Time `json:"timestamp"`
-			Payload   struct {
-				Registry         string    `json:"registry"`
-				Namespace        string    `json:"namespace"`
-				Image            string    `json:"image"`
-				Tag              string    `json:"tag"`
-				Digests          []string  `json:"digests"`
-				ImageLastUpdated time.Time `json:"imageLastUpdated"`
-				TagLastUpdated   time.Time `json:"tagLastUpdated"`
-				Description      string    `json:"description"`
-				StarCount        int       `json:"starCount"`
-				PullCount        int64     `json:"pullCount"`
-			} `json:"payload"`
-		} `json:"decoration"`
+		GUID             string `json:"guid"`
+		Name             string `json:"name"`
+		Severity         string `json:"severity"`
+		ShortDescription string `json:"shortDescription"`
+		// StartTime        time.Time `json:"startTime"`
+		StartTime interface{} `json:"startTime"`
+		Status    string      `json:"status"`
 	} `json:"event"`
-	Sourcetype string `json:"sourcetype"`
+	Provider struct {
+		AccountID string `json:"accountId"`
+	} `json:"provider"`
+	ProviderID   string `json:"providerId"`
+	ProviderType string `json:"providerType"`
+	Resource     struct {
+		Identifier string `json:"identifier"`
+		Name       string `json:"name"`
+		Region     string `json:"region"`
+		Type       string `json:"type"`
+		Zone       string `json:"zone"`
+	} `json:"resource"`
+	Source struct {
+		SourceID   string `json:"sourceId"`
+		SourceName string `json:"sourceName"`
+	} `json:"source"`
 }
+
+// type expectedEvent struct {
+// 	Event struct {
+// 		Event struct {
+// 			Metadata struct {
+// 				GUID             int         `json:"guid"`
+// 				Name             string      `json:"name"`
+// 				URL              interface{} `json:"url"`
+// 				Severity         string      `json:"severity"`
+// 				ShortDescription string      `json:"shortDescription"`
+// 				LongDescription  string      `json:"longDescription"`
+// 				Time             int         `json:"time"`
+// 			} `json:"metadata"`
+// 			Producer struct {
+// 				Name string `json:"name"`
+// 			} `json:"producer"`
+// 			Reporter struct {
+// 				Name string `json:"name"`
+// 			} `json:"reporter"`
+// 			Resources []struct {
+// 				GUID      string `json:"guid"`
+// 				Name      string `json:"name"`
+// 				Region    string `json:"region"`
+// 				Platform  string `json:"platform"`
+// 				Service   string `json:"service"`
+// 				Type      string `json:"type"`
+// 				AccountID string `json:"accountId"`
+// 				Package   string `json:"package"`
+// 			} `json:"resources"`
+// 		} `json:"event"`
+// 		Decoration []struct {
+// 			Decorator string    `json:"decorator"`
+// 			Timestamp time.Time `json:"timestamp"`
+// 			Payload   struct {
+// 				Registry         string    `json:"registry"`
+// 				Namespace        string    `json:"namespace"`
+// 				Image            string    `json:"image"`
+// 				Tag              string    `json:"tag"`
+// 				Digests          []string  `json:"digests"`
+// 				ImageLastUpdated time.Time `json:"imageLastUpdated"`
+// 				TagLastUpdated   time.Time `json:"tagLastUpdated"`
+// 				Description      string    `json:"description"`
+// 				StarCount        int       `json:"starCount"`
+// 				PullCount        int64     `json:"pullCount"`
+// 			} `json:"payload"`
+// 		} `json:"decoration"`
+// 	} `json:"event"`
+// 	Sourcetype string `json:"sourcetype"`
+// }
 
 type azuresentineltargetadapter struct {
 	client         *http.Client

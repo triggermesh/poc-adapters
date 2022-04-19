@@ -66,45 +66,74 @@ const getTokenResponse = await cca.acquireTokenByClientCredential(tokenRequest);
     res.status(415).header("Content-Type", "application/json").send(JSON.stringify(err));
   }
 
+  console.log(event.data.event);
 
+  // const incident = {
+  //     "properties": {
+  //         "providerIncidentId": event.data.provider.accountId,
+  //         "severity": "High",
+  //         "status": "Active",
+  //         "title": event.data.event.name,
+  //         "description": event.data.event.shortDescription,
+  //         "additionalData": {
+  //             // "alertProductNames": [
+  //             //   // event.data.resource,
+  //             //   // event.data.event.resources[0].platform,
+  //             //   // event.data.event.resources[0].accountId,
+  //             //   // event.data.event.resources[0].region,
+  //             //   // event.data.event.resources[0].service,
+  //             //   // event.data.event.resources[0].type + ':' + event.data.event.resources[0].name + ':' + event.data.event.resources[0].guid
+  //             // ]
+  //         },
+  //         "labels": [
+  //             {
+  //                 "labelName": "test",
+  //                 "labelType": "User"
+  //             }
+  //         ]
+  //     }
+  // };
   const incident = {
       "properties": {
-          "providerIncidentId": event.data.event.event.resource.identifier,
           "severity": "High",
           "status": "Active",
-          "title": event.data.event.event.metadata.name,
-          "description": event.data.event.event.metadata.shortDescription,
+          "title": "test",
+          "description": "test",
           "additionalData": {
-              "alertProductNames": [
-                event.data.event.event.resources[0].platform,
-                event.data.event.event.resources[0].accountId,
-                event.data.event.event.resources[0].region,
-                event.data.event.event.resources[0].service,
-                event.data.event.event.resources[0].type + ':' + event.data.event.event.resources[0].name + ':' + event.data.event.event.resources[0].guid
-              ]
+              // "alertProductNames": [
+              //   // event.data.resource,
+              //   // event.data.event.resources[0].platform,
+              //   // event.data.event.resources[0].accountId,
+              //   // event.data.event.resources[0].region,
+              //   // event.data.event.resources[0].service,
+              //   // event.data.event.resources[0].type + ':' + event.data.event.resources[0].name + ':' + event.data.event.resources[0].guid
+              // ]
           },
           "labels": [
               {
-                  "labelName": event.data.event.event.reporter.name,
+                  "labelName": "test",
                   "labelType": "User"
               }
           ]
       }
   };
 
+  console.log(incident)
+
 
   try {
     const result = await axios.put(requestUrl, incident,{
         headers: {
-            'Authorization': `Bearer ${getTokenResponse.accessToken}`
+            'Authorization': `Bearer ${getTokenResponse.accessToken}`,
+            'content-type': 'application/json'
         }
     });
-    console.log(result);
-    if (result.status === 200 || result.status === 201) {
+    // console.log(result);
+    if (result.status === 200) {
         logger.debug('incident successfully dispatched');
         console.log('incident successfully dispatched');
     } else {
-        logger.error('failed to dispatch incident', result);
+        logger.error('failed to dispatch incident', result.data);
         res.status(500).send(result);
     }
 } catch (e) {
@@ -112,7 +141,7 @@ const getTokenResponse = await cca.acquireTokenByClientCredential(tokenRequest);
     res.status(500).send(e);
 }
 
-  res.status(200).header("Content-Type", "application/json").send("ok");
+  res.status(200).send("ok");
 });
 
 app.listen(8080, () => {

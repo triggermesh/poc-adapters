@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -129,23 +130,61 @@ func (a *azuresentineltargetadapter) dispatch(ctx context.Context, event cloudev
 func createIncident(ee expectedEvent) *Incident {
 	i := &Incident{}
 	alertProductNames := []string{}
-	alertProductNames = append(alertProductNames, ee.Event.Event.Resources[0].Platform)
-	alertProductNames = append(alertProductNames, ee.Event.Event.Resources[0].AccountID)
-	alertProductNames = append(alertProductNames, ee.Event.Event.Resources[0].Region)
-	alertProductNames = append(alertProductNames, ee.Event.Event.Resources[0].Service)
-	alertProductNames = append(alertProductNames, ee.Event.Event.Resources[0].Type+":"+ee.Event.Event.Resources[0].Name+":"+ee.Event.Event.Resources[0].GUID)
-	i.Properties.Title = ee.Event.Event.Metadata.Name
-	i.Properties.Description = ee.Event.Event.Metadata.ShortDescription
+	alertProductNames = append(alertProductNames, ee.Event.GUID)
+	alertProductNames = append(alertProductNames, ee.Event.Name)
+	alertProductNames = append(alertProductNames, ee.Event.Severity)
+	alertProductNames = append(alertProductNames, ee.Event.ShortDescription)
+
+	// i.Properties.ProviderIncidentId = ee.Event.GUID
+
+	fmt.Printf("+%v", ee.Event)
+
+	i.Properties.Title = ee.Event.Name
+	i.Properties.Description = ee.Event.ShortDescription
 	i.Properties.AdditionalData.AlertProductNames = alertProductNames
-	i.Properties.Labels = []struct {
-		LabelName string `json:"labelName"`
-		LabelType string `json:"labelType"`
-	}{
-		{
-			LabelName: ee.Event.Event.Reporter.Name,
-			LabelType: "User",
-		},
-	}
+
+	i.Properties.Owner.AssignedTo = ee.Resource.Name
+
+	// incidentLabelType := IncidentLabel{
+	// 	LabelName: ee.Provider.AccountID,
+	// 	LabelType: IncidentLabelType[
+	// 		{
+	// 		Name: "Account",
+	// 		Type: "Azure",
+	// 		},
+	// 	]
+	// 	},
+	// }
+
+	// i.Properties.Labels = incidentLabelType
+
+	// i.Properties.Labels = []struct {
+	// 	LabelName string `json:"labelName"`
+	// 	LabelType string `json:"labelType"`
+	// }{
+	// 	{
+	// 		LabelName: ee.Provider.AccountID,
+	// 		LabelType: "accountID",
+	// 	},
+	// }
+	// alertProductNames := []string{}
+	// alertProductNames = append(alertProductNames, ee.Event.Event.Resources[0].Platform)
+	// alertProductNames = append(alertProductNames, ee.Event.Event.Resources[0].AccountID)
+	// alertProductNames = append(alertProductNames, ee.Event.Event.Resources[0].Region)
+	// alertProductNames = append(alertProductNames, ee.Event.Event.Resources[0].Service)
+	// alertProductNames = append(alertProductNames, ee.Event.Event.Resources[0].Type+":"+ee.Event.Event.Resources[0].Name+":"+ee.Event.Event.Resources[0].GUID)
+	// i.Properties.Title = ee.Event.Event.Metadata.Name
+	// i.Properties.Description = ee.Event.Event.Metadata.ShortDescription
+	// i.Properties.AdditionalData.AlertProductNames = alertProductNames
+	// i.Properties.Labels = []struct {
+	// 	LabelName string `json:"labelName"`
+	// 	LabelType string `json:"labelType"`
+	// }{
+	// 	{
+	// 		LabelName: "accountID",
+	// 		LabelType: ee.Provider.AccountID,
+	// 	},
+	// }
 	i.Properties.Severity = "High"
 	i.Properties.Status = "Active"
 	return i
