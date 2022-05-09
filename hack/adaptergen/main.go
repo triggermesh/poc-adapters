@@ -106,6 +106,14 @@ func main() {
 		log.Fatalf("failed creating the Dockerfile: %v", err)
 	}
 
+	// go mod
+	if err := temp.replaceTemplates(
+		filepath.Join(templatesPath, "go.mod"),
+		filepath.Join(*cfgDir, temp.LowercaseKind, "go.mod"),
+	); err != nil {
+		log.Fatalf("failed creating the go.mod: %v", err)
+	}
+
 	fmt.Println("done")
 }
 
