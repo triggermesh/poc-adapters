@@ -57,11 +57,6 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
 
-	query, err := gojq.Parse(env.Query)
-	if err != nil {
-		logger.Panicf("Error creating query: %v", err)
-	}
-
 	return &{{.LowercaseKind}}adapter{
 		sink:     env.Sink,
 		replier:  replier,
