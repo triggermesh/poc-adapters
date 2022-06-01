@@ -1,0 +1,10 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: knatarget
+spec:
+  template:
+    spec:
+      containers:
+        - image: gcr.io/fit-stream-305821/kna:latest
+          env:
