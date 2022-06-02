@@ -1,0 +1,10 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: kafkatarget
+spec:
+  template:
+    spec:
+      containers:
+        - image: gcr.io/triggermesh/kafkatarget:latest
+          env:
