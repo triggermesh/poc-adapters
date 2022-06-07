@@ -3,8 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+
+	// "fmt"
 	"log"
 	"net/http"
+	"os"
+
+	"go.uber.org/zap"
 )
 
 type namecard struct {
@@ -13,31 +18,58 @@ type namecard struct {
 }
 
 func main() {
+	logger, _ := zap.NewProduction()
+	defer logger.Sync() // flushes buffer, if any
+	sugar := logger.Sugar()
+	// sugar.Infow("failed to fetch URL")
 
-	fmt.Println("******************TRANSFORMATION APP*********************")
-
+	sugar.Info("TRANSFORMATION APP")
+	http.HandleFunc("/", home)
 	http.HandleFunc("/index", Index)
+	http.HandleFunc("/bobtom", BobTom)
+	port := os.Getenv("PORT")
+	sugar.Infof("server started at : %s", port)
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
+		// log.Fatal(err)
+		sugar.Fatal(err)
 
-	fmt.Println("Sever started at port 3000\nselect localhost:3000/index")
-	if err := http.ListenAndServe(":3000", nil); err != nil {
-		log.Fatal(err)
 	}
 
 }
 
+//this function will reverse the name
+
 func Index(w http.ResponseWriter, r *http.Request) {
-
 	name := &namecard{}
-
 	if err := json.NewDecoder(r.Body).Decode(&name); err != nil {
 		log.Fatal(err)
 	}
 	str := name.Name
 	strrev := Reverse(str)
-	fmt.Println("After transformation ", strrev)
+	log.Println("After transformation ", strrev)
 
 	json.NewEncoder(w).Encode(&name)
+}
 
+// for transforming bob to tom
+func BobTom(w http.ResponseWriter, r *http.Request) {
+	name := &namecard{}
+	if err := json.NewDecoder(r.Body).Decode(&name); err != nil {
+		log.Fatal(err)
+	}
+
+	bob := name.Name
+	if bob == "bob" {
+		name.Name = "tom"
+	} else {
+		log.Fatal("Name value is not BOB : Can't transform")
+	}
+	json.NewEncoder(w).Encode(&name)
+
+}
+
+func home(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Menue\n1.Goto '/index' for reverse action\n2.Goto '/bobtom' for transformation option%v", r.URL.Path[:1])
 }
 
 // for reversing string
