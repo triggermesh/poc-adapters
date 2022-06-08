@@ -72,7 +72,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Menue\n1.Goto '/index' for reverse action\n2.Goto '/bobtom' for transformation option%v", r.URL.Path[:1])
 }
 
-// for reversing string
+// Reverse accepts a single string input and returns the reverse of the input.
 func Reverse(s string) string {
 	runes := []rune(s)
 	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
