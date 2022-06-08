@@ -1,3 +1,19 @@
+/*
+Copyright 2022 TriggerMesh Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package main
 
 import (
@@ -25,8 +41,8 @@ func main() {
 
 	sugar.Info("TRANSFORMATION APP")
 	http.HandleFunc("/", home)
-	http.HandleFunc("/index", Index)
-	http.HandleFunc("/bobtom", BobTom)
+	http.HandleFunc("/index", index)
+	http.HandleFunc("/bobtom", bobTom)
 	port := os.Getenv("PORT")
 	sugar.Infof("server started at : %s", port)
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
@@ -37,22 +53,21 @@ func main() {
 
 }
 
-//this function will reverse the name
-
-func Index(w http.ResponseWriter, r *http.Request) {
+// index will reverse the name
+func index(w http.ResponseWriter, r *http.Request) {
 	name := &namecard{}
 	if err := json.NewDecoder(r.Body).Decode(&name); err != nil {
 		log.Fatal(err)
 	}
 	str := name.Name
-	strrev := Reverse(str)
+	strrev := reverse(str)
 	log.Println("After transformation ", strrev)
 
 	json.NewEncoder(w).Encode(&name)
 }
 
-// for transforming bob to tom
-func BobTom(w http.ResponseWriter, r *http.Request) {
+// bobTom transforms bob to tom
+func bobTom(w http.ResponseWriter, r *http.Request) {
 	name := &namecard{}
 	if err := json.NewDecoder(r.Body).Decode(&name); err != nil {
 		log.Fatal(err)
@@ -72,8 +87,8 @@ func home(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Menue\n1.Goto '/index' for reverse action\n2.Goto '/bobtom' for transformation option%v", r.URL.Path[:1])
 }
 
-// Reverse accepts a single string input and returns the reverse of the input.
-func Reverse(s string) string {
+// reverse accepts a single string input and returns the reverse of the input.
+func reverse(s string) string {
 	runes := []rune(s)
 	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
 		runes[i], runes[j] = runes[j], runes[i]
