@@ -19,12 +19,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-
-	// "fmt"
 	"log"
 	"net/http"
 	"os"
-
 	"go.uber.org/zap"
 )
 

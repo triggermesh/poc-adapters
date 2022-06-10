@@ -22,8 +22,9 @@ go run main.go
 
 - Now fire up seprate terminal for client and execute the following
 
+
 ```cmd
-curl -X POST localhost:3000/bobtom \
+curl -X POST localhost:<port-number>/<method name> \
    -H 'Content-Type: application/json' \
    -d '{"name":"bob","address":"my_password"}'
    ```
