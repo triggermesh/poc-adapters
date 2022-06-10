@@ -1,0 +1,11 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: kafkasource
+spec:
+  template:
+    spec:
+      containers:
+        - image: ko://github.com/triggermesh/tmdebugger/backend/cmd/tmdebugger/
+          env:
+          - name: confluent_security_mecanisms
